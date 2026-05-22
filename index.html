@@ -6,44 +6,164 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>綺矢李射くん</title>
-  <link rel="stylesheet" type="text/css" href="style.css" />
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
   <div class="app">
-   
-    <div class="title">
-      <p id="connection-status">接続確認中...</p>
-      次世代飛脚<br>－綺矢李射くん－
-    </div>
 
-    <div class="map">
-      マップ
-    </div>
+    <!-- ヘッダー -->
+    <header class="header">
 
-    <div class="grid">
+      <div class="time">
+        13:54　5月22日(金)
+      </div>
 
-      <div class="box">4I</div>
-      <div class="box">5I</div>
+      <div class="title-area">
+        <h1>綺矢李射くん</h1>
+        <p>Autonomous Robot</p>
+      </div>
 
-      <div class="box">男子トイレ</div>
-      <div class="box">女子トイレ</div>
+      <div class="status">
+        <span class="online-dot"></span>
+        ONLINE
+      </div>
 
-      <div class="box">松崎先生 教員室</div>
-      <div class="box">滝沢先生 教員室</div>
+    </header>
 
-      <div class="box">7</div>
-      <div class="box">8</div>
+    <!-- メイン -->
+    <main class="main">
 
-    </div>
+      <!-- 左エリア -->
+      <div class="left-area">
+
+        <!-- マップ -->
+        <section class="map-panel glass">
+
+          <div class="floor-tag">
+            5F
+          </div>
+
+          <div class="map">
+            MAP
+          </div>
+
+        </section>
+
+        <!-- 下ボタン -->
+        <div class="controls">
+
+          <button class="control-btn stop">
+            一時停止
+          </button>
+
+          <button class="control-btn start">
+            ▶ 自動運転を開始
+          </button>
+
+          <button class="control-btn emergency">
+            緊急停止
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- 右 -->
+      <aside class="side">
+
+        <!-- 目的地 -->
+        <div class="card glass">
+
+          <h2>目的地を選択</h2>
+
+          <div class="destination active">
+            <span>4F</span>
+            <span>約1分</span>
+          </div>
+
+          <div class="destination">
+            <span>5F</span>
+            <span>約1分</span>
+          </div>
+
+          <div class="destination">
+            <span>男子トイレ</span>
+            <span>約1分</span>
+          </div>
+
+          <div class="destination">
+            <span>女子トイレ</span>
+            <span>約1分</span>
+          </div>
+
+          <div class="destination">
+            <span>松崎先生 教員室</span>
+            <span>約2分</span>
+          </div>
+
+        </div>
+
+        <!-- ルート情報 -->
+        <div class="card glass">
+
+          <h2>ルート情報</h2>
+
+          <div class="info-grid">
+
+            <div>
+              <p class="label">到着予想</p>
+              <p class="value">1分20秒</p>
+            </div>
+
+            <div>
+              <p class="label">距離</p>
+              <p class="value">68m</p>
+            </div>
+
+            <div>
+              <p class="label">進行状況</p>
+              <p class="value">65%</p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ロボット状態 -->
+        <div class="card glass">
+
+          <h2>ロボットの状態</h2>
+
+          <div class="info-grid">
+
+            <div>
+              <p class="label">速度</p>
+              <p class="value">1.2 m/s</p>
+            </div>
+
+            <div>
+              <p class="label">バッテリー</p>
+              <p class="value">82%</p>
+            </div>
+
+            <div>
+              <p class="label">接続状態</p>
+              <p class="value green">良好</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </aside>
+
+    </main>
 
   </div>
-  
-    <script src="./roslib.js"> </script>
-    <script src="./script.js"> </script>
-  
-</body>
 
+</body>
 
 </html>
