@@ -17,9 +17,7 @@
     <!-- ヘッダー -->
     <header class="header">
 
-      <div class="time">
-        13:54　5月22日(金)
-      </div>
+      <div class="time" id="current-time"></div>
 
       <div class="title-area">
         <h1>綺矢李射くん</h1>
@@ -163,6 +161,28 @@
     </main>
 
   </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+
+      const week = ["日", "月", "火", "水", "木", "金", "土"];
+      const day = week[now.getDay()];
+
+      document.getElementById("current-time").textContent =
+        `${hours}:${minutes}　${month}月${date}日(${day})`;
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+
 
 </body>
 
