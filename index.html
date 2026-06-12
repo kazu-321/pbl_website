@@ -31,6 +31,34 @@
 
     </header>
 
+    <!-- メニューボタン -->
+    <button class="menu-btn" id="menu-btn">
+      ☰
+    </button>
+
+    <!-- 背景の暗くなる部分 -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+
+    <!-- サイドメニュー -->
+    <nav class="side-menu" id="side-menu">
+
+      <h2>メニュー</h2>
+
+      <div class="menu-item">⚙ 設定</div>
+      <div class="menu-item">📍 目的地履歴</div>
+      <div class="menu-item">🕒 走行履歴</div>
+
+      <div class="theme-area">
+
+        <p class="theme-title">画面テーマ</p>
+
+        <button class="theme-toggle" id="theme-toggle">
+          ☀ ホワイトモード
+        </button>
+
+      </div>
+    </nav>
+
     <!-- メイン -->
     <main class="main">
 
@@ -39,10 +67,6 @@
 
         <!-- マップ -->
         <section class="map-panel glass">
-
-          <div class="floor-tag">
-            5F
-          </div>
 
           <div class="map">
             MAP
@@ -61,7 +85,7 @@
             ▶ 自動運転を開始
           </button>
 
-          <button class="control-btn emergency">
+          <button class="control-btn emergency" id="emergency-btn">
             緊急停止
           </button>
 
@@ -162,6 +186,31 @@
 
   </div>
 
+  <!-- 緊急停止確認モーダル -->
+  <div class="modal" id="emergency-modal">
+
+    <div class="modal-box glass">
+
+      <h2>緊急停止しますか？</h2>
+
+      <p>ロボットをただちに停止します。</p>
+
+      <div class="modal-buttons">
+
+        <button class="modal-btn cancel" id="cancel-emergency">
+          いいえ
+        </button>
+
+        <button class="modal-btn confirm" id="confirm-emergency">
+          はい
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
   <script>
     function updateTime() {
       const now = new Date();
@@ -181,6 +230,73 @@
 
     updateTime();
     setInterval(updateTime, 1000);
+
+    //緊急停止
+    const emergencyBtn = document.getElementById("emergency-btn");
+    const emergencyModal = document.getElementById("emergency-modal");
+    const cancelEmergency = document.getElementById("cancel-emergency");
+    const confirmEmergency = document.getElementById("confirm-emergency");
+
+    emergencyBtn.addEventListener("click", function () {
+      emergencyModal.classList.add("show");
+    });
+
+    cancelEmergency.addEventListener("click", function () {
+      emergencyModal.classList.remove("show");
+    });
+
+    confirmEmergency.addEventListener("click", function () {
+      emergencyModal.classList.remove("show");
+    });
+
+    // ボタンの色の切り替え
+    const destinations = document.querySelectorAll(".destination");
+
+    destinations.forEach(destination => {
+
+      destination.addEventListener("click", () => {
+
+        // 全部のactiveを消す
+        destinations.forEach(item => {
+          item.classList.remove("active");
+        });
+
+        // クリックしたやつだけactive
+        destination.classList.add("active");
+
+      });
+
+    });
+
+    // サイドメニューの開閉
+    const menuBtn = document.getElementById("menu-btn");
+    const sideMenu = document.getElementById("side-menu");
+    const menuOverlay = document.getElementById("menu-overlay");
+
+    menuBtn.addEventListener("click", function () {
+      sideMenu.classList.toggle("show");
+      menuOverlay.classList.toggle("show");
+    });
+
+    menuOverlay.addEventListener("click", function () {
+      sideMenu.classList.remove("show");
+      menuOverlay.classList.remove("show");
+    });
+
+    // テーマ切り替え
+    const themeToggle = document.getElementById("theme-toggle");
+
+    themeToggle.addEventListener("click", function () {
+
+      document.body.classList.toggle("light-mode");
+
+      if (document.body.classList.contains("light-mode")) {
+        themeToggle.textContent = "🌙 ダークモード";
+      } else {
+        themeToggle.textContent = "☀ ホワイトモード";
+      }
+
+    });
   </script>
 
 
