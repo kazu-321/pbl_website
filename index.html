@@ -30,7 +30,7 @@
 
       <div class="status">
         <span class="online-dot"></span>
-        <span class="status-text">ONLINE</span>
+        <p id="connection-status">...</span>
       </div>
 
     </header>
@@ -68,11 +68,7 @@
 
       <!-- マップ -->
       <section class="map-panel glass">
-
-        <div class="map">
-          MAP
-        </div>
-
+        <canvas id="canvas"></canvas>
         <button class="map-location-btn" aria-label="現在地を表示">
           ◎
         </button>
@@ -427,6 +423,10 @@
     resetSheetForViewport();
   </script>
 
+    <script src="./scripts/roslib.js"> </script>
+    <script src="./scripts/script.js"> </script>
+    <script src="./scripts/map.js"> </script>
+    
 </body>
 
 </html>
