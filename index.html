@@ -3,11 +3,12 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#07101f">
 
   <title>綺矢李射くん</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css?v=20260619-4">
 </head>
 
 <body>
@@ -17,7 +18,10 @@
     <!-- ヘッダー -->
     <header class="header">
 
-      <div class="time" id="current-time"></div>
+      <div class="time">
+        <span id="current-time"></span>
+        <span class="current-date" id="current-date"></span>
+      </div>
 
       <div class="title-area">
         <h1>綺矢李射くん</h1>
@@ -26,13 +30,13 @@
 
       <div class="status">
         <span class="online-dot"></span>
-        ONLINE
+        <span class="status-text">ONLINE</span>
       </div>
 
     </header>
 
     <!-- メニューボタン -->
-    <button class="menu-btn" id="menu-btn">
+    <button class="menu-btn" id="menu-btn" aria-label="メニューを開く" aria-expanded="false">
       ☰
     </button>
 
@@ -62,19 +66,134 @@
     <!-- メイン -->
     <main class="main">
 
-      <!-- 左エリア -->
-      <div class="left-area">
+      <!-- マップ -->
+      <section class="map-panel glass">
 
-        <!-- マップ -->
-        <section class="map-panel glass">
+        <div class="map">
+          MAP
+        </div>
 
-          <div class="map">
-            MAP
+        <button class="map-location-btn" aria-label="現在地を表示">
+          ◎
+        </button>
+
+      </section>
+
+      <!-- PCでは右側、スマホでは下から出るボトムシート -->
+      <aside class="side" id="bottom-sheet" aria-label="操作パネル">
+
+        <!-- スマホだけ表示するドラッグ部分 -->
+        <div class="sheet-drag-area" id="sheet-drag-area" aria-label="操作パネルを開閉">
+          <span class="sheet-handle"></span>
+        </div>
+
+        <!-- スマホの閉じた状態で見える概要 -->
+        <div class="sheet-summary">
+
+          <div class="sheet-summary-text">
+            <p class="sheet-eyebrow">選択中の目的地</p>
+            <h2 id="selected-destination">4F</h2>
+            <p>
+              <span id="selected-time">約1分</span>
+              <span>・68m</span>
+            </p>
           </div>
 
-        </section>
+          <button class="sheet-toggle" id="sheet-toggle" type="button" aria-expanded="false">
+            詳細
+          </button>
 
-        <!-- 下ボタン -->
+        </div>
+
+        <div class="side-cards">
+
+          <!-- 目的地 -->
+          <div class="card glass destination-card">
+
+            <h2>目的地を選択</h2>
+
+            <div class="destination active">
+              <span>4F</span>
+              <span>約1分</span>
+            </div>
+
+            <div class="destination">
+              <span>5F</span>
+              <span>約1分</span>
+            </div>
+
+            <div class="destination">
+              <span>男子トイレ</span>
+              <span>約1分</span>
+            </div>
+
+            <div class="destination">
+              <span>女子トイレ</span>
+              <span>約1分</span>
+            </div>
+
+            <div class="destination">
+              <span>松崎先生 教員室</span>
+              <span>約2分</span>
+            </div>
+
+          </div>
+
+          <!-- ルート情報 -->
+          <div class="card glass">
+
+            <h2>ルート情報</h2>
+
+            <div class="info-grid">
+
+              <div>
+                <p class="label">到着予想</p>
+                <p class="value">1分20秒</p>
+              </div>
+
+              <div>
+                <p class="label">距離</p>
+                <p class="value">68m</p>
+              </div>
+
+              <div>
+                <p class="label">進行状況</p>
+                <p class="value">65%</p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ロボット状態 -->
+          <div class="card glass">
+
+            <h2>ロボットの状態</h2>
+
+            <div class="info-grid">
+
+              <div>
+                <p class="label">速度</p>
+                <p class="value">1.2 m/s</p>
+              </div>
+
+              <div>
+                <p class="label">バッテリー</p>
+                <p class="value">82%</p>
+              </div>
+
+              <div>
+                <p class="label">接続状態</p>
+                <p class="value green">良好</p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- PCではマップ下、スマホではボトムシート下部 -->
         <div class="controls">
 
           <button class="control-btn stop">
@@ -88,95 +207,6 @@
           <button class="control-btn emergency" id="emergency-btn">
             緊急停止
           </button>
-
-        </div>
-
-      </div>
-
-      <!-- 右 -->
-      <aside class="side">
-
-        <!-- 目的地 -->
-        <div class="card glass">
-
-          <h2>目的地を選択</h2>
-
-          <div class="destination active">
-            <span>4F</span>
-            <span>約1分</span>
-          </div>
-
-          <div class="destination">
-            <span>5F</span>
-            <span>約1分</span>
-          </div>
-
-          <div class="destination">
-            <span>男子トイレ</span>
-            <span>約1分</span>
-          </div>
-
-          <div class="destination">
-            <span>女子トイレ</span>
-            <span>約1分</span>
-          </div>
-
-          <div class="destination">
-            <span>松崎先生 教員室</span>
-            <span>約2分</span>
-          </div>
-
-        </div>
-
-        <!-- ルート情報 -->
-        <div class="card glass">
-
-          <h2>ルート情報</h2>
-
-          <div class="info-grid">
-
-            <div>
-              <p class="label">到着予想</p>
-              <p class="value">1分20秒</p>
-            </div>
-
-            <div>
-              <p class="label">距離</p>
-              <p class="value">68m</p>
-            </div>
-
-            <div>
-              <p class="label">進行状況</p>
-              <p class="value">65%</p>
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- ロボット状態 -->
-        <div class="card glass">
-
-          <h2>ロボットの状態</h2>
-
-          <div class="info-grid">
-
-            <div>
-              <p class="label">速度</p>
-              <p class="value">1.2 m/s</p>
-            </div>
-
-            <div>
-              <p class="label">バッテリー</p>
-              <p class="value">82%</p>
-            </div>
-
-            <div>
-              <p class="label">接続状態</p>
-              <p class="value green">良好</p>
-            </div>
-
-          </div>
 
         </div>
 
@@ -224,14 +254,14 @@
       const week = ["日", "月", "火", "水", "木", "金", "土"];
       const day = week[now.getDay()];
 
-      document.getElementById("current-time").textContent =
-        `${hours}:${minutes}　${month}月${date}日(${day})`;
+      document.getElementById("current-time").textContent = `${hours}:${minutes}`;
+      document.getElementById("current-date").textContent = `${month}月${date}日(${day})`;
     }
 
     updateTime();
     setInterval(updateTime, 1000);
 
-    //緊急停止
+    // 緊急停止
     const emergencyBtn = document.getElementById("emergency-btn");
     const emergencyModal = document.getElementById("emergency-modal");
     const cancelEmergency = document.getElementById("cancel-emergency");
@@ -249,23 +279,20 @@
       emergencyModal.classList.remove("show");
     });
 
-    // ボタンの色の切り替え
+    // 目的地の色とスマホ概要の切り替え
     const destinations = document.querySelectorAll(".destination");
+    const selectedDestination = document.getElementById("selected-destination");
+    const selectedTime = document.getElementById("selected-time");
 
     destinations.forEach(destination => {
-
       destination.addEventListener("click", () => {
-
-        // 全部のactiveを消す
-        destinations.forEach(item => {
-          item.classList.remove("active");
-        });
-
-        // クリックしたやつだけactive
+        destinations.forEach(item => item.classList.remove("active"));
         destination.classList.add("active");
 
+        const destinationData = destination.querySelectorAll("span");
+        selectedDestination.textContent = destinationData[0].textContent;
+        selectedTime.textContent = destinationData[1].textContent;
       });
-
     });
 
     // サイドメニューの開閉
@@ -273,21 +300,25 @@
     const sideMenu = document.getElementById("side-menu");
     const menuOverlay = document.getElementById("menu-overlay");
 
-    menuBtn.addEventListener("click", function () {
-      sideMenu.classList.toggle("show");
-      menuOverlay.classList.toggle("show");
-    });
-
-    menuOverlay.addEventListener("click", function () {
+    function closeMenu() {
       sideMenu.classList.remove("show");
       menuOverlay.classList.remove("show");
+      menuBtn.setAttribute("aria-expanded", "false");
+    }
+
+    menuBtn.addEventListener("click", function () {
+      const willOpen = !sideMenu.classList.contains("show");
+      sideMenu.classList.toggle("show", willOpen);
+      menuOverlay.classList.toggle("show", willOpen);
+      menuBtn.setAttribute("aria-expanded", String(willOpen));
     });
+
+    menuOverlay.addEventListener("click", closeMenu);
 
     // テーマ切り替え
     const themeToggle = document.getElementById("theme-toggle");
 
     themeToggle.addEventListener("click", function () {
-
       document.body.classList.toggle("light-mode");
 
       if (document.body.classList.contains("light-mode")) {
@@ -295,10 +326,106 @@
       } else {
         themeToggle.textContent = "☀ ホワイトモード";
       }
-
     });
-  </script>
 
+    // スマホ用ボトムシート
+    const bottomSheet = document.getElementById("bottom-sheet");
+    const sheetDragArea = document.getElementById("sheet-drag-area");
+    const sheetSummary = document.querySelector(".sheet-summary");
+    const sheetToggle = document.getElementById("sheet-toggle");
+    const sheetSwipeAreas = [sheetDragArea, sheetSummary];
+    const mobileMedia = window.matchMedia("(max-width: 900px)");
+
+    let isDragging = false;
+    let activeSwipeArea = null;
+    let startY = 0;
+    let startOffset = 0;
+    let currentOffset = 0;
+
+    function getClosedOffset() {
+      const visibleHeight = 142;
+      return Math.max(0, bottomSheet.offsetHeight - visibleHeight);
+    }
+
+    function setSheetExpanded(expanded) {
+      bottomSheet.classList.toggle("is-expanded", expanded);
+      bottomSheet.style.removeProperty("transform");
+      bottomSheet.classList.remove("is-dragging");
+      sheetToggle.textContent = expanded ? "閉じる" : "詳細";
+      sheetToggle.setAttribute("aria-expanded", String(expanded));
+      document.body.classList.toggle("sheet-expanded", expanded);
+    }
+
+    function resetSheetForViewport() {
+      if (!mobileMedia.matches) {
+        setSheetExpanded(false);
+        bottomSheet.style.removeProperty("transform");
+      }
+    }
+
+    sheetToggle.addEventListener("click", () => {
+      setSheetExpanded(!bottomSheet.classList.contains("is-expanded"));
+    });
+
+    function startSheetDrag(event) {
+      if (!mobileMedia.matches) return;
+
+      // 「詳細」ボタンなどの操作を邪魔しない
+      if (event.target.closest("button")) return;
+
+      isDragging = true;
+      activeSwipeArea = event.currentTarget;
+      startY = event.clientY;
+      startOffset = bottomSheet.classList.contains("is-expanded")
+        ? 0
+        : getClosedOffset();
+      currentOffset = startOffset;
+
+      bottomSheet.classList.add("is-dragging");
+      activeSwipeArea.setPointerCapture(event.pointerId);
+    }
+
+    function moveSheetDrag(event) {
+      if (!isDragging || !mobileMedia.matches) return;
+
+      const maxOffset = getClosedOffset();
+      const moved = event.clientY - startY;
+      currentOffset = Math.min(maxOffset, Math.max(0, startOffset + moved));
+
+      bottomSheet.style.transform = `translateY(${currentOffset}px)`;
+    }
+
+    function finishSheetDrag(event) {
+      if (!isDragging) return;
+
+      isDragging = false;
+      const movedDistance = Math.abs(event.clientY - startY);
+      const maxOffset = getClosedOffset();
+
+      if (activeSwipeArea?.hasPointerCapture(event.pointerId)) {
+        activeSwipeArea.releasePointerCapture(event.pointerId);
+      }
+      activeSwipeArea = null;
+
+      if (movedDistance < 6) {
+        setSheetExpanded(!bottomSheet.classList.contains("is-expanded"));
+        return;
+      }
+
+      setSheetExpanded(currentOffset < maxOffset * 0.55);
+    }
+
+    // ハンドルだけでなく、閉じた状態で見えている概要部分全体からスワイプできる
+    sheetSwipeAreas.forEach(area => {
+      area.addEventListener("pointerdown", startSheetDrag);
+      area.addEventListener("pointermove", moveSheetDrag);
+      area.addEventListener("pointerup", finishSheetDrag);
+      area.addEventListener("pointercancel", finishSheetDrag);
+    });
+
+    window.addEventListener("resize", resetSheetForViewport);
+    resetSheetForViewport();
+  </script>
 
 </body>
 
