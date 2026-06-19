@@ -1,23 +1,70 @@
+// ==============================
+// ROS
+// ==============================
+
 const ros = new ROSLIB.Ros({
-    url: "ws://pbl.local:9090"
+
+    url: "ws://10.38.162.95:9090"
+});
+
+const connection_status =
+    document.getElementById(
+        "connection-status"
+    );
+
+
+// ==============================
+// Connection
+// ==============================
+
+ros.on("connection", () => {
+
+    console.log("Connected");
+
+    connection_status.textContent =
+        "接続中";
+
+    subscribeMap();
+
+    subscribePath();
+
+});
+
+ros.on("close", () => {
+
+    console.log("Disconnected");
+
+    connection_status.textContent =
+        "未接続";
+});
+
+ros.on("error", (error) => {
+
+    console.error(error);
+
+    connection_status.textContent =
+        "接続エラー";
 });
 
 
-const connection_status = document.getElementById('connection-status');
+// ==============================
+// Draw Loop
+// ==============================
 
-// 接続時
-ros.on('connection', () => {
-    connection_status.textContent = '接続中';
-});
+function draw() {
 
-// 切断時
-ros.on('close', () => {
-    connection_status.textContent = '未接続';
-});
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
 
-// エラー時
-ros.on('error', (error) => {
-    console.error('ROS connection error:', error);
-    connection_status.textContent = '接続エラー';
-});
+    drawMap();
 
+    drawPath();
+
+    requestAnimationFrame(draw);
+}
+
+draw();
