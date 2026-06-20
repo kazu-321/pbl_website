@@ -87,7 +87,7 @@ function drawPath() {
         const screenY =
             mapToScreenY(correctedY);
 
-
+            
         if (i === 0) {
 
             ctx.moveTo(
