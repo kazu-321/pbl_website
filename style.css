@@ -12,6 +12,12 @@ body {
 
 :root {
   color-scheme: dark;
+  background-color: #050816;
+}
+
+:root.light-mode {
+  color-scheme: light;
+  background-color: #f3f6fb;
 }
 
 button,
@@ -834,4 +840,12 @@ body.light-mode .map-location-btn {
   .control-btn {
     font-size: 11px;
   }
+}
+
+/* ライトモード時にページ全体の背景を確実に明るくする */
+html.light-mode,
+body.light-mode,
+body.light-mode .app,
+body.light-mode .main {
+  background: #f3f6fb !important;
 }
