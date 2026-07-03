@@ -3,6 +3,7 @@
 // ==============================
 
 const ros = new ROSLIB.Ros({
+
     url: "ws://kazubuntu24.local:9090"
 });
 
@@ -45,6 +46,8 @@ ros.on("error", (error) => {
     connection_status.textContent =
         "接続エラー";
 });
+
+initializeController(ros);
 
 // ==============================
 // Draw Loop
