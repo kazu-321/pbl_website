@@ -12,6 +12,7 @@ const connection_status =
         "connection-status"
     );
 
+initializeGoalPublisher(ros);
 // ==============================
 // Connection
 // ==============================

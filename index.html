@@ -30,7 +30,7 @@
 
       <div class="status">
         <span class="online-dot"></span>
-        <p id="connection-status">...</span>
+        <p id="connection-status">...</p>
       </div>
 
     </header>
@@ -88,9 +88,9 @@
 
           <div class="sheet-summary-text">
             <p class="sheet-eyebrow">選択中の目的地</p>
-            <h2 id="selected-destination">4F</h2>
+            <h2 id="selected-destination">読み込み中...</h2>
             <p>
-              <span id="selected-time">約1分</span>
+              <span id="selected-time">--</span>
               <span>・68m</span>
             </p>
           </div>
@@ -108,30 +108,9 @@
 
             <h2>目的地を選択</h2>
 
-            <div class="destination active">
-              <span>4F</span>
-              <span>約1分</span>
-            </div>
-
-            <div class="destination">
-              <span>5F</span>
-              <span>約1分</span>
-            </div>
-
-            <div class="destination">
-              <span>男子トイレ</span>
-              <span>約1分</span>
-            </div>
-
-            <div class="destination">
-              <span>女子トイレ</span>
-              <span>約1分</span>
-            </div>
-
-            <div class="destination">
-              <span>松崎先生 教員室</span>
-              <span>約2分</span>
-            </div>
+            
+            <!-- 目的地ボタンは goal.js が manifest.json から自動生成します -->
+            <p id="destination-loading">目的地を読み込み中...</p>
 
           </div>
 
@@ -227,22 +206,6 @@
 
     updateTime();
     setInterval(updateTime, 1000);
-
-    // 目的地の色とスマホ概要の切り替え
-    const destinations = document.querySelectorAll(".destination");
-    const selectedDestination = document.getElementById("selected-destination");
-    const selectedTime = document.getElementById("selected-time");
-
-    destinations.forEach(destination => {
-      destination.addEventListener("click", () => {
-        destinations.forEach(item => item.classList.remove("active"));
-        destination.classList.add("active");
-
-        const destinationData = destination.querySelectorAll("span");
-        selectedDestination.textContent = destinationData[0].textContent;
-        selectedTime.textContent = destinationData[1].textContent;
-      });
-    });
 
     // サイドメニューの開閉
     const menuBtn = document.getElementById("menu-btn");
@@ -389,6 +352,7 @@
     <script src="./scripts/roslib.js"> </script>
     <script src="./scripts/map.js"> </script>
     <script src="./scripts/path.js"> </script>
+    <script src="./scripts/goal.js"></script>
     <script src="./scripts/pose.js"></script>
     <script src="./scripts/controller.js"></script>
     <script src="./scripts/script.js"> </script>
