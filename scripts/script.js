@@ -3,7 +3,6 @@
 // ==============================
 
 const ros = new ROSLIB.Ros({
-
     url: "ws://kazubuntu24.local:9090"
 });
 
@@ -12,10 +11,7 @@ const connection_status =
         "connection-status"
     );
 
-// goal.jsの目的地送信機能を初期化
 initializeGoalPublisher(ros);
-
-
 // ==============================
 // Connection
 // ==============================
@@ -30,6 +26,8 @@ ros.on("connection", () => {
     subscribeMap();
 
     subscribePath();
+
+    subscribePose();
 
 });
 
@@ -49,7 +47,6 @@ ros.on("error", (error) => {
         "接続エラー";
 });
 
-
 // ==============================
 // Draw Loop
 // ==============================
@@ -67,6 +64,8 @@ function draw() {
 
     drawPath();
 
+    drawRobot();
+    
     requestAnimationFrame(draw);
 }
 
