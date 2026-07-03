@@ -55,18 +55,72 @@ function drawRobot() {
     const screenY = mapToScreenY(correctedY);
 
     // 自己位置
-    ctx.beginPath();
-    ctx.arc(
-        screenX,
-        screenY,
-        10,
-        0,
-        Math.PI * 2
+    // ==============================
+    // ロボット（四角＋矢印）
+    // ==============================
+
+    // ロボットの向き（Quaternion → Yaw）
+    const q = robotPose.pose.orientation;
+
+    const yaw = Math.atan2(
+        2 * (q.w * q.z + q.x * q.y),
+        1 - 2 * (q.y * q.y + q.z * q.z)
     );
+
+    // 描画位置へ移動
+    ctx.save();
+
+    ctx.translate(
+        screenX,
+        screenY
+    );
+
+    // 向きを反映
+    ctx.rotate(-yaw + Math.PI / 2);
+
+    // ------------------------------
+    // 四角
+    // ------------------------------
+
     ctx.fillStyle = "#0066ff";
-    ctx.fill();
+
+    ctx.fillRect(
+        -10,
+        -10,
+        20,
+        20
+    );
 
     ctx.lineWidth = 2;
     ctx.strokeStyle = "white";
+
+    ctx.strokeRect(
+        -10,
+        -10,
+        20,
+        20
+    );
+
+    // ------------------------------
+    // 矢印
+    // ------------------------------
+
+    ctx.beginPath();
+
+    ctx.moveTo(0, -6);
+
+    ctx.lineTo(0, 6);
+
+    ctx.lineTo(6, 2);
+
+    ctx.moveTo(0, 6);
+
+    ctx.lineTo(-6, 2);
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+
     ctx.stroke();
-}
+
+    ctx.restore();
+    }
