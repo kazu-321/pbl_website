@@ -5,13 +5,29 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// Canvasの表示領域に合わせて描画サイズを更新
+function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const width = Math.max(1, Math.round(rect.width));
+    const height = Math.max(1, Math.round(rect.height));
+
+    if (canvas.width !== width) {
+        canvas.width = width;
+    }
+
+    if (canvas.height !== height) {
+        canvas.height = height;
+    }
+}
+
+resizeCanvas();
 
 document.body.style.margin = "0";
 document.body.style.overflow = "hidden";
 document.body.style.background = "black";
-document.body.style.touchAction = "none";
+
+// マップ上だけブラウザ標準のスクロール・拡大操作を止める
+canvas.style.touchAction = "none";
 
 
 // ==============================
@@ -116,10 +132,10 @@ function buildMapImage() {
             }
 
             mapCtx.fillRect(
-            (width - 1 - x) / MAP_SKIP,
-            y / MAP_SKIP,
-            1,
-            1
+                (width - 1 - x) / MAP_SKIP,
+                y / MAP_SKIP,
+                1,
+                1
             );
         }
     }
@@ -197,76 +213,317 @@ function drawMap() {
 
 
 // ==============================
-// Mouse Drag
+// Map Touch / Mouse Control
 // ==============================
 
-let dragging = false;
+// PointerEventを使うことで、マウス・指・タッチペンを同じ処理で扱う
+const activePointers = new Map();
 
-let lastX = 0;
-let lastY = 0;
-
-canvas.addEventListener("mousedown", (e) => {
-
-    dragging = true;
-
-    lastX = e.clientX;
-    lastY = e.clientY;
-});
-
-window.addEventListener("mouseup", () => {
-
-    dragging = false;
-});
-
-window.addEventListener("mousemove", (e) => {
-
-    if (!dragging) return;
-
-    const dx = e.clientX - lastX;
-    const dy = e.clientY - lastY;
-
-    cameraX -= dx / zoom;
-    cameraY += dy / zoom;
-
-    lastX = e.clientX;
-    lastY = e.clientY;
-});
+let lastSinglePoint = null;
+let lastPinchDistance = null;
+let lastPinchCenter = null;
 
 
 // ==============================
-// Zoom
+// Utility
 // ==============================
 
-canvas.addEventListener("wheel", (e) => {
+function getCanvasPoint(event) {
+    const rect = canvas.getBoundingClientRect();
 
-    e.preventDefault();
+    return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+    };
+}
 
-    if (e.deltaY > 0) {
+function getDistance(point1, point2) {
+    return Math.hypot(
+        point2.x - point1.x,
+        point2.y - point1.y
+    );
+}
 
-        zoom *= 0.9;
+function getCenter(point1, point2) {
+    return {
+        x: (point1.x + point2.x) / 2,
+        y: (point1.y + point2.y) / 2
+    };
+}
 
-    } else {
-
-        zoom *= 1.1;
-    }
-
-    zoom = Math.max(
+function clampZoom(value) {
+    return Math.max(
         2,
-        Math.min(zoom, 200)
+        Math.min(value, 200)
+    );
+}
+
+
+// ==============================
+// Pointer Down
+// ==============================
+
+canvas.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+
+    const point = getCanvasPoint(event);
+
+    activePointers.set(
+        event.pointerId,
+        point
     );
 
-}, { passive: false });
+    canvas.setPointerCapture(event.pointerId);
+    canvas.classList.add("is-dragging");
+
+    // 指・マウスが1つだけなら地図移動を開始
+    if (activePointers.size === 1) {
+        lastSinglePoint = point;
+        lastPinchDistance = null;
+        lastPinchCenter = null;
+    }
+
+    // 2本指になったらピンチ操作を開始
+    if (activePointers.size === 2) {
+        const points = [...activePointers.values()];
+
+        lastPinchDistance = getDistance(
+            points[0],
+            points[1]
+        );
+
+        lastPinchCenter = getCenter(
+            points[0],
+            points[1]
+        );
+
+        lastSinglePoint = null;
+    }
+});
+
+
+// ==============================
+// Pointer Move
+// ==============================
+
+canvas.addEventListener("pointermove", (event) => {
+    if (!activePointers.has(event.pointerId)) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const point = getCanvasPoint(event);
+
+    activePointers.set(
+        event.pointerId,
+        point
+    );
+
+    // ------------------------------
+    // 1本指・マウスドラッグ：地図移動
+    // ------------------------------
+
+    if (activePointers.size === 1) {
+        const currentPoint =
+            [...activePointers.values()][0];
+
+        if (lastSinglePoint) {
+            const dx =
+                currentPoint.x - lastSinglePoint.x;
+
+            const dy =
+                currentPoint.y - lastSinglePoint.y;
+
+            cameraX -= dx / zoom;
+            cameraY += dy / zoom;
+
+            // 手動操作時はロボット追従を解除
+            followRobot = false;
+        }
+
+        lastSinglePoint = currentPoint;
+        return;
+    }
+
+    // ------------------------------
+    // 2本指：拡大縮小＋地図移動
+    // ------------------------------
+
+    if (activePointers.size >= 2) {
+        const points =
+            [...activePointers.values()];
+
+        const currentDistance =
+            getDistance(points[0], points[1]);
+
+        const currentCenter =
+            getCenter(points[0], points[1]);
+
+        if (
+            lastPinchDistance &&
+            lastPinchCenter
+        ) {
+            // 前回の2本指中央位置にある地図座標を求める
+            const worldX =
+                cameraX +
+                (
+                    lastPinchCenter.x -
+                    canvas.width / 2
+                ) / zoom;
+
+            const worldY =
+                cameraY +
+                (
+                    canvas.height / 2 -
+                    lastPinchCenter.y
+                ) / zoom;
+
+            const scale =
+                currentDistance /
+                lastPinchDistance;
+
+            const newZoom =
+                clampZoom(zoom * scale);
+
+            // 指の中央にある地点がずれないようにカメラ位置を更新
+            cameraX =
+                worldX -
+                (
+                    currentCenter.x -
+                    canvas.width / 2
+                ) / newZoom;
+
+            cameraY =
+                worldY -
+                (
+                    canvas.height / 2 -
+                    currentCenter.y
+                ) / newZoom;
+
+            zoom = newZoom;
+            followRobot = false;
+        }
+
+        lastPinchDistance = currentDistance;
+        lastPinchCenter = currentCenter;
+    }
+});
+
+
+// ==============================
+// Pointer Up / Cancel
+// ==============================
+
+function finishPointer(event) {
+    activePointers.delete(event.pointerId);
+
+    if (canvas.hasPointerCapture(event.pointerId)) {
+        canvas.releasePointerCapture(event.pointerId);
+    }
+
+    // 2本指から1本指になったら、その位置から移動操作を続ける
+    if (activePointers.size === 1) {
+        lastSinglePoint =
+            [...activePointers.values()][0];
+
+        lastPinchDistance = null;
+        lastPinchCenter = null;
+        return;
+    }
+
+    // 3本以上から2本になった場合にもピンチ状態を作り直す
+    if (activePointers.size >= 2) {
+        const points =
+            [...activePointers.values()];
+
+        lastPinchDistance =
+            getDistance(points[0], points[1]);
+
+        lastPinchCenter =
+            getCenter(points[0], points[1]);
+
+        return;
+    }
+
+    lastSinglePoint = null;
+    lastPinchDistance = null;
+    lastPinchCenter = null;
+
+    canvas.classList.remove("is-dragging");
+}
+
+canvas.addEventListener("pointerup", finishPointer);
+canvas.addEventListener("pointercancel", finishPointer);
+
+
+// ==============================
+// Mouse Wheel Zoom
+// ==============================
+
+canvas.addEventListener("wheel", (event) => {
+    event.preventDefault();
+
+    const point = getCanvasPoint(event);
+
+    // マウスカーソル位置にある地図座標を求める
+    const worldX =
+        cameraX +
+        (
+            point.x -
+            canvas.width / 2
+        ) / zoom;
+
+    const worldY =
+        cameraY +
+        (
+            canvas.height / 2 -
+            point.y
+        ) / zoom;
+
+    const scale =
+        event.deltaY > 0 ? 0.9 : 1.1;
+
+    const newZoom =
+        clampZoom(zoom * scale);
+
+    // カーソル位置を中心に拡大・縮小する
+    cameraX =
+        worldX -
+        (
+            point.x -
+            canvas.width / 2
+        ) / newZoom;
+
+    cameraY =
+        worldY -
+        (
+            canvas.height / 2 -
+            point.y
+        ) / newZoom;
+
+    zoom = newZoom;
+    followRobot = false;
+
+}, {
+    passive: false
+});
 
 
 // ==============================
 // Resize
 // ==============================
 
-window.addEventListener("resize", () => {
+window.addEventListener("resize", resizeCanvas);
 
-    canvas.width =
-        window.innerWidth;
-
-    canvas.height =
-        window.innerHeight;
+window.addEventListener("orientationchange", () => {
+    setTimeout(resizeCanvas, 200);
 });
+
+// PCレイアウトの幅変更など、Canvas自体のサイズ変更にも対応
+if (typeof ResizeObserver !== "undefined") {
+    const canvasResizeObserver =
+        new ResizeObserver(resizeCanvas);
+
+    canvasResizeObserver.observe(canvas);
+}
