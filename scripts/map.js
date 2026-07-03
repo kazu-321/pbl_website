@@ -116,10 +116,10 @@ function buildMapImage() {
             }
 
             mapCtx.fillRect(
-                x / MAP_SKIP,
-                y / MAP_SKIP,
-                1,
-                1
+            (width - 1 - x) / MAP_SKIP,
+            y / MAP_SKIP,
+            1,
+            1
             );
         }
     }
