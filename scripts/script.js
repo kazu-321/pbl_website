@@ -4,7 +4,7 @@
 
 const ros = new ROSLIB.Ros({
 
-    url: "ws://10.38.162.95:9090"
+    url: "ws://10.180.185.95:9090"
 });
 
 const connection_status =
@@ -27,6 +27,8 @@ ros.on("connection", () => {
     subscribeMap();
 
     subscribePath();
+
+    subscribePose();
 
 });
 
@@ -64,6 +66,8 @@ function draw() {
 
     drawPath();
 
+    drawRobot();
+    
     requestAnimationFrame(draw);
 }
 
