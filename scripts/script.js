@@ -3,7 +3,6 @@
 // ==============================
 
 const ros = new ROSLIB.Ros({
-
     url: "ws://kazubuntu24.local:9090"
 });
 
@@ -27,6 +26,8 @@ ros.on("connection", () => {
     subscribeMap();
 
     subscribePath();
+
+    subscribePose();
 
 });
 
@@ -64,6 +65,8 @@ function draw() {
 
     drawPath();
 
+    drawRobot();
+    
     requestAnimationFrame(draw);
 }
 
