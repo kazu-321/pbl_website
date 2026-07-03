@@ -57,6 +57,13 @@ function drawPath() {
     const worldHeight =
         mapHeight * resolution;
 
+    const originX =
+        occupancyGrid.info.origin.position.x;
+
+    const worldWidth =
+        occupancyGrid.info.width *
+        occupancyGrid.info.resolution;
+
 
     ctx.strokeStyle = "#00ffff";
     ctx.lineWidth = 4;
@@ -75,8 +82,20 @@ function drawPath() {
             pose.pose.position.y;
 
 
+        const originX =
+            occupancyGrid.info.origin.position.x;
+
+        const worldWidth =
+            occupancyGrid.info.width *
+            occupancyGrid.info.resolution;
+
+        const correctedX =
+            originX +
+            worldWidth -
+            (x - originX);
+
         const screenX =
-            mapToScreenX(x);
+            mapToScreenX(correctedX);
 
         // 地図描画と同じY反転
         const correctedY =
@@ -131,8 +150,13 @@ function drawPath() {
 
     ctx.beginPath();
 
+    const correctedGoalX =
+        originX +
+        worldWidth -
+        (goalX - originX);
+
     ctx.arc(
-        mapToScreenX(goalX),
+        mapToScreenX(correctedGoalX),
         mapToScreenY(correctedGoalY),
         8,
         0,
