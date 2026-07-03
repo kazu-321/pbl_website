@@ -51,7 +51,21 @@ function drawRobot() {
         worldHeight -
         (y - originY);
 
-    const screenX = mapToScreenX(x);
+    const originX =
+        occupancyGrid.info.origin.position.x;
+
+    const worldWidth =
+        occupancyGrid.info.width *
+        occupancyGrid.info.resolution;
+
+    const correctedX =
+        originX +
+        worldWidth -
+        (x - originX);
+
+    const screenX =
+        mapToScreenX(correctedX);
+        
     const screenY = mapToScreenY(correctedY);
 
     // 自己位置
