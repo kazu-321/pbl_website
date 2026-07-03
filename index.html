@@ -8,7 +8,7 @@
 
   <title>綺矢李射くん</title>
 
-  <link rel="stylesheet" href="./style.css?v=20260619-4">
+  <link rel="stylesheet" href="./style.css?v=20260626-2">
 </head>
 
 <body>
@@ -313,15 +313,25 @@
 
     // テーマ切り替え
     const themeToggle = document.getElementById("theme-toggle");
+    const rootElement = document.documentElement;
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
     themeToggle.addEventListener("click", function () {
-      document.body.classList.toggle("light-mode");
+      const isLightMode = !document.body.classList.contains("light-mode");
 
-      if (document.body.classList.contains("light-mode")) {
-        themeToggle.textContent = "🌙 ダークモード";
-      } else {
-        themeToggle.textContent = "☀ ホワイトモード";
-      }
+      // bodyだけでなくhtmlにも付けて、画面外や余白も確実に切り替える
+      document.body.classList.toggle("light-mode", isLightMode);
+      rootElement.classList.toggle("light-mode", isLightMode);
+
+      themeToggle.textContent = isLightMode
+        ? "🌙 ダークモード"
+        : "☀ ホワイトモード";
+
+      // スマホのブラウザ上部などの色もテーマに合わせる
+      themeColorMeta?.setAttribute(
+        "content",
+        isLightMode ? "#f3f6fb" : "#07101f"
+      );
     });
 
     // スマホ用ボトムシート
@@ -423,11 +433,11 @@
     resetSheetForViewport();
   </script>
 
-    <script src="./scripts/roslib.js"> </script>
-    <script src="./scripts/map.js"> </script>
-    <script src="./scripts/path.js"> </script>
-    
-    <script src="./scripts/script.js"> </script>
+  <script src="./scripts/roslib.js"> </script>
+  <script src="./scripts/map.js"> </script>
+  <script src="./scripts/path.js"> </script>
+
+  <script src="./scripts/script.js"> </script>
 </body>
 
 </html>
