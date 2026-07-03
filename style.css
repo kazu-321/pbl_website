@@ -12,6 +12,12 @@ body {
 
 :root {
   color-scheme: dark;
+  background-color: #050816;
+}
+
+:root.light-mode {
+  color-scheme: light;
+  background-color: #f3f6fb;
 }
 
 button,
@@ -28,7 +34,7 @@ body {
   overflow: hidden;
 
   background:
-    radial-gradient(circle at top, #18233f, #050816);
+    radial-gradient(circle at top, #18233f, #111827);
 
   color: white;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -834,4 +840,12 @@ body.light-mode .map-location-btn {
   .control-btn {
     font-size: 11px;
   }
+}
+
+/* ライトモード時にページ全体の背景を確実に明るくする */
+html.light-mode,
+body.light-mode,
+body.light-mode .app,
+body.light-mode .main {
+  background: #f3f6fb !important;
 }
