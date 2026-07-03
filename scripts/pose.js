@@ -23,6 +23,7 @@ function subscribePose() {
 
         // 必要なら確認用
         // console.log(robotPose.pose.position);
+
     });
 }
 
