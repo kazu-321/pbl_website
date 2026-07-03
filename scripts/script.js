@@ -4,7 +4,7 @@
 
 const ros = new ROSLIB.Ros({
 
-    url: "ws://10.38.162.95:9090"
+    url: "ws://kazubuntu24.local:9090"
 });
 
 const connection_status =
