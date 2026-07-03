@@ -192,16 +192,12 @@
         <!-- PCではマップ下、スマホではボトムシート下部 -->
         <div class="controls">
 
-          <button class="control-btn stop">
+          <button class="control-btn stop" id="power-toggle-btn" type="button">
             一時停止
           </button>
 
-          <button class="control-btn start">
+          <button class="control-btn start" id="auto-toggle-btn" type="button">
             ▶ 自動運転を開始
-          </button>
-
-          <button class="control-btn emergency" id="emergency-btn">
-            緊急停止
           </button>
 
         </div>
@@ -209,31 +205,6 @@
       </aside>
 
     </main>
-
-  </div>
-
-  <!-- 緊急停止確認モーダル -->
-  <div class="modal" id="emergency-modal">
-
-    <div class="modal-box glass">
-
-      <h2>緊急停止しますか？</h2>
-
-      <p>ロボットをただちに停止します。</p>
-
-      <div class="modal-buttons">
-
-        <button class="modal-btn cancel" id="cancel-emergency">
-          いいえ
-        </button>
-
-        <button class="modal-btn confirm" id="confirm-emergency">
-          はい
-        </button>
-
-      </div>
-
-    </div>
 
   </div>
 
@@ -256,24 +227,6 @@
 
     updateTime();
     setInterval(updateTime, 1000);
-
-    // 緊急停止
-    const emergencyBtn = document.getElementById("emergency-btn");
-    const emergencyModal = document.getElementById("emergency-modal");
-    const cancelEmergency = document.getElementById("cancel-emergency");
-    const confirmEmergency = document.getElementById("confirm-emergency");
-
-    emergencyBtn.addEventListener("click", function () {
-      emergencyModal.classList.add("show");
-    });
-
-    cancelEmergency.addEventListener("click", function () {
-      emergencyModal.classList.remove("show");
-    });
-
-    confirmEmergency.addEventListener("click", function () {
-      emergencyModal.classList.remove("show");
-    });
 
     // 目的地の色とスマホ概要の切り替え
     const destinations = document.querySelectorAll(".destination");
@@ -437,7 +390,8 @@
   <script src="./scripts/map.js"> </script>
   <script src="./scripts/path.js"> </script>
 
-  <script src="./scripts/script.js"> </script>
+  <script src="./scripts/script.js"></script>
+  <script src="./scripts/controller.js"></script>
 </body>
 
 </html>

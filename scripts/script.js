@@ -12,7 +12,6 @@ const connection_status =
         "connection-status"
     );
 
-
 // ==============================
 // Connection
 // ==============================
@@ -45,7 +44,6 @@ ros.on("error", (error) => {
     connection_status.textContent =
         "接続エラー";
 });
-
 
 // ==============================
 // Draw Loop
