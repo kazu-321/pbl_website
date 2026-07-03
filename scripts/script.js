@@ -12,6 +12,9 @@ const connection_status =
         "connection-status"
     );
 
+// goal.jsの目的地送信機能を初期化
+initializeGoalPublisher(ros);
+
 
 // ==============================
 // Connection
