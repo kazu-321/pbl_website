@@ -1,4 +1,4 @@
-console.log("controller.js auto/manual view version loaded");
+console.log("controller.js auto/manual view + circle hit area loaded");
 
 // ==============================
 // Controller
@@ -6,7 +6,7 @@ console.log("controller.js auto/manual view version loaded");
 
 function initializeController(ros) {
 
-    // 二重初期化防止
+    // 二重初期化を防ぐ
     if (window.__robotControllerInitialized) {
         return;
     }
@@ -72,65 +72,47 @@ function initializeController(ros) {
     let activePointerId = null;
     let publishTimer = null;
     let savedSummary = null;
+    let currentPanelMode = null;
 
+    // 中央付近の小さな入力を0として扱う
     const DEAD_ZONE = 0.08;
+
+    // 手動操作値の送信周期（50ms = 20Hz）
     const PUBLISH_INTERVAL = 50;
+
+    // /controller/joy のボタン番号
+    const POWER_STOP_BUTTON = 0;
+    const POWER_RESUME_BUTTON = 1;
+    const AUTO_STOP_BUTTON = 2;
+    const AUTO_START_BUTTON = 3;
 
 
     // ==============================
     // ROS Topics
     // ==============================
 
-    let joyTopic = null;
-    let powerStateTopic = null;
-    let autoStateTopic = null;
+    const joyTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/controller/joy",
+        messageType: "sensor_msgs/Joy"
+    });
 
-    try {
+    const powerStateTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/power",
+        messageType: "std_msgs/Bool"
+    });
 
-        joyTopic = new ROSLIB.Topic({
-            ros: ros,
-            name: "/controller/joy",
-            messageType: "sensor_msgs/Joy"
-        });
-
-        powerStateTopic = new ROSLIB.Topic({
-            ros: ros,
-            name: "/power",
-            messageType: "std_msgs/Bool"
-        });
-
-        autoStateTopic = new ROSLIB.Topic({
-            ros: ros,
-            name: "/is_auto",
-            messageType: "std_msgs/Bool"
-        });
-
-    } catch (error) {
-
-        console.error(
-            "ControllerのROS Topic作成に失敗しました",
-            error
-        );
-    }
+    const autoStateTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/is_auto",
+        messageType: "std_msgs/Bool"
+    });
 
 
     // ==============================
-    // Utility
+    // ROS Publish
     // ==============================
-
-    function clamp(value, minimum, maximum) {
-        return Math.min(
-            maximum,
-            Math.max(minimum, value)
-        );
-    }
-
-    function applyDeadZone(value) {
-        if (Math.abs(value) < DEAD_ZONE) {
-            return 0;
-        }
-        return value;
-    }
 
     function isRosConnected() {
         return Boolean(
@@ -178,14 +160,19 @@ function initializeController(ros) {
     }
 
     function publishManualAxes() {
-        // auto運転中はジョイスティック送信しない
+        // 自動運転中はジョイスティック値を送らない
         if (autoIsRunning) {
             return;
         }
 
         /*
-         * axes[0] = 左右旋回
-         * axes[1] = 前後移動
+         * axes[0] = 旋回
+         *   左旋回：正
+         *   右旋回：負
+         *
+         * axes[1] = 前後
+         *   前進：正
+         *   後退：負
          */
         publishJoy(
             [
@@ -204,6 +191,26 @@ function initializeController(ros) {
             [0, 0],
             [0, 0, 0, 0]
         );
+    }
+
+
+    // ==============================
+    // Utility
+    // ==============================
+
+    function clamp(value, minimum, maximum) {
+        return Math.min(
+            maximum,
+            Math.max(minimum, value)
+        );
+    }
+
+    function applyDeadZone(value) {
+        if (Math.abs(value) < DEAD_ZONE) {
+            return 0;
+        }
+
+        return value;
     }
 
     function closeSideMenu() {
@@ -227,7 +234,107 @@ function initializeController(ros) {
 
 
     // ==============================
-    // Summary
+    // Power / Auto Buttons
+    // ==============================
+
+    function updatePowerButton() {
+        if (!powerToggleBtn) {
+            return;
+        }
+
+        powerToggleBtn.textContent =
+            powerIsRunning
+                ? "一時停止"
+                : "再開";
+    }
+
+    function updateAutoButton() {
+        if (!autoToggleBtn) {
+            return;
+        }
+
+        // ジョイスティックを触っている間は自動運転を開始させない
+        autoToggleBtn.disabled =
+            !autoIsRunning &&
+            activePointerId !== null;
+
+        autoToggleBtn.textContent =
+            autoIsRunning
+                ? "自動運転を停止"
+                : "▶ 自動運転を開始";
+    }
+
+    function setPowerState(value) {
+        powerIsRunning = Boolean(value);
+        updatePowerButton();
+    }
+
+    function setAutoState(value) {
+        autoIsRunning = Boolean(value);
+        updateAutoButton();
+
+        setRightPanelMode(
+            autoIsRunning
+                ? "auto"
+                : "manual"
+        );
+    }
+
+    powerToggleBtn?.addEventListener(
+        "click",
+        () => {
+            publishJoyButton(
+                powerIsRunning
+                    ? POWER_STOP_BUTTON
+                    : POWER_RESUME_BUTTON
+            );
+        }
+    );
+
+    autoToggleBtn?.addEventListener(
+        "click",
+        () => {
+            // ジョイスティック操作中は開始しない
+            if (
+                !autoIsRunning &&
+                activePointerId !== null
+            ) {
+                return;
+            }
+
+            if (autoIsRunning) {
+                publishJoyButton(AUTO_STOP_BUTTON);
+
+                // ROSから状態が返る前でも画面を切り替える
+                setAutoState(false);
+            } else {
+                resetJoystick(true);
+                publishJoyButton(AUTO_START_BUTTON);
+
+                // ROSから状態が返る前でも画面を切り替える
+                setAutoState(true);
+            }
+
+            closeSideMenu();
+        }
+    );
+
+
+    // ==============================
+    // Subscribe
+    // ==============================
+
+    powerStateTopic.subscribe((message) => {
+        setPowerState(message.data);
+    });
+
+    autoStateTopic.subscribe((message) => {
+        setAutoState(message.data);
+    });
+
+
+    // ==============================
+    // Mobile Summary
     // ==============================
 
     function saveSummary() {
@@ -254,15 +361,18 @@ function initializeController(ros) {
         saveSummary();
 
         if (sheetEyebrow) {
-            sheetEyebrow.textContent = "操作モード";
+            sheetEyebrow.textContent =
+                "操作モード";
         }
 
         if (selectedDestination) {
-            selectedDestination.textContent = "手動操作";
+            selectedDestination.textContent =
+                "手動操作";
         }
 
         if (selectedTime) {
-            selectedTime.textContent = "ジョイスティック";
+            selectedTime.textContent =
+                "ジョイスティック";
         }
     }
 
@@ -272,25 +382,58 @@ function initializeController(ros) {
         }
 
         if (sheetEyebrow) {
-            sheetEyebrow.textContent = savedSummary.eyebrow;
+            sheetEyebrow.textContent =
+                savedSummary.eyebrow;
         }
 
         if (selectedDestination) {
-            selectedDestination.textContent = savedSummary.destination;
+            selectedDestination.textContent =
+                savedSummary.destination;
         }
 
         if (selectedTime) {
-            selectedTime.textContent = savedSummary.time;
+            selectedTime.textContent =
+                savedSummary.time;
         }
     }
 
 
     // ==============================
-    // View Control
+    // Publish Timer
+    // ==============================
+
+    function startPublishing() {
+        stopPublishing();
+
+        publishTimer = window.setInterval(
+            publishManualAxes,
+            PUBLISH_INTERVAL
+        );
+    }
+
+    function stopPublishing() {
+        if (publishTimer === null) {
+            return;
+        }
+
+        window.clearInterval(publishTimer);
+        publishTimer = null;
+    }
+
+
+    // ==============================
+    // Right Panel Mode
     // ==============================
 
     function setRightPanelMode(mode) {
         const isManual = mode === "manual";
+
+        // 同じモードならジョイスティック操作を中断しない
+        if (currentPanelMode === mode) {
+            return;
+        }
+
+        currentPanelMode = mode;
 
         document.body.classList.toggle(
             "manual-view",
@@ -314,103 +457,13 @@ function initializeController(ros) {
 
         if (isManual) {
             showManualSummary();
+            resetJoystick(false);
             startPublishing();
         } else {
-            restoreSummary();
             stopPublishing();
             resetJoystick(true);
+            restoreSummary();
         }
-    }
-
-
-    // ==============================
-    // Buttons
-    // ==============================
-
-    function updatePowerButton() {
-        if (!powerToggleBtn) {
-            return;
-        }
-
-        powerToggleBtn.textContent =
-            powerIsRunning
-                ? "一時停止"
-                : "再開";
-    }
-
-    function updateAutoButton() {
-        if (!autoToggleBtn) {
-            return;
-        }
-
-        autoToggleBtn.disabled = false;
-
-        autoToggleBtn.textContent =
-            autoIsRunning
-                ? "自動運転を停止"
-                : "▶ 自動運転を開始";
-    }
-
-    powerToggleBtn?.addEventListener(
-        "click",
-        () => {
-            publishJoyButton(
-                powerIsRunning ? 0 : 1
-            );
-        }
-    );
-
-    autoToggleBtn?.addEventListener(
-        "click",
-        () => {
-
-            if (autoIsRunning) {
-                // 自動運転停止
-                publishJoyButton(2);
-                autoIsRunning = false;
-                updateAutoButton();
-                setRightPanelMode("manual");
-            } else {
-                // 自動運転開始
-                publishJoyButton(3);
-                autoIsRunning = true;
-                updateAutoButton();
-                setRightPanelMode("auto");
-            }
-
-            closeSideMenu();
-        }
-    );
-
-
-    // ==============================
-    // Subscribe
-    // ==============================
-
-    try {
-
-        powerStateTopic?.subscribe((message) => {
-            powerIsRunning = Boolean(message.data);
-            updatePowerButton();
-        });
-
-        autoStateTopic?.subscribe((message) => {
-            autoIsRunning = Boolean(message.data);
-            updateAutoButton();
-
-            if (autoIsRunning) {
-                setRightPanelMode("auto");
-            } else {
-                setRightPanelMode("manual");
-            }
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Controllerのsubscribeに失敗しました",
-            error
-        );
     }
 
 
@@ -462,33 +515,6 @@ function initializeController(ros) {
 
 
     // ==============================
-    // Publish Timer
-    // ==============================
-
-    function startPublishing() {
-        stopPublishing();
-
-        publishTimer =
-            window.setInterval(
-                publishManualAxes,
-                PUBLISH_INTERVAL
-            );
-    }
-
-    function stopPublishing() {
-        if (publishTimer === null) {
-            return;
-        }
-
-        window.clearInterval(
-            publishTimer
-        );
-
-        publishTimer = null;
-    }
-
-
-    // ==============================
     // Joystick Reset
     // ==============================
 
@@ -507,6 +533,7 @@ function initializeController(ros) {
         );
 
         updateManualDisplay();
+        updateAutoButton();
 
         if (sendStop) {
             publishManualStop();
@@ -515,11 +542,45 @@ function initializeController(ros) {
 
 
     // ==============================
+    // Joystick Hit Test
+    // 外側の円の中だけ操作開始を許可する
+    // ==============================
+
+    function isInsideJoystickCircle(event) {
+        if (!joystickBase) {
+            return false;
+        }
+
+        const rect =
+            joystickBase.getBoundingClientRect();
+
+        const centerX =
+            rect.left + rect.width / 2;
+
+        const centerY =
+            rect.top + rect.height / 2;
+
+        const radius =
+            Math.min(
+                rect.width,
+                rect.height
+            ) / 2;
+
+        const distance =
+            Math.hypot(
+                event.clientX - centerX,
+                event.clientY - centerY
+            );
+
+        return distance <= radius;
+    }
+
+
+    // ==============================
     // Joystick Position
     // ==============================
 
     function updateJoystick(event) {
-
         if (
             !joystickBase ||
             !joystickStick
@@ -547,11 +608,21 @@ function initializeController(ros) {
         const rawY =
             event.clientY - centerY;
 
+        /*
+         * スティックの中心が外円を越えないよう、
+         * ノブの半径を差し引いた範囲に制限する。
+         */
         const maximumRadius =
             Math.max(
                 1,
-                baseRect.width / 2 -
-                stickRect.width / 2 -
+                Math.min(
+                    baseRect.width,
+                    baseRect.height
+                ) / 2 -
+                Math.max(
+                    stickRect.width,
+                    stickRect.height
+                ) / 2 -
                 8
             );
 
@@ -563,12 +634,10 @@ function initializeController(ros) {
                 ? maximumRadius / distance
                 : 1;
 
-        const x =
-            rawX * scale;
+        const x = rawX * scale;
+        const y = rawY * scale;
 
-        const y =
-            rawY * scale;
-
+        // 左旋回を正、右旋回を負にするためXを反転
         manualTurn =
             applyDeadZone(
                 clamp(
@@ -599,83 +668,113 @@ function initializeController(ros) {
     // Joystick Events
     // ==============================
 
-    joystickZone?.addEventListener(
+    if (joystickBase) {
+        // スマホのブラウザ標準スクロールを止める
+        joystickBase.style.touchAction = "none";
+        joystickBase.style.cursor = "grab";
+    }
+
+    joystickBase?.addEventListener(
         "pointerdown",
         (event) => {
-
             if (autoIsRunning) {
+                return;
+            }
+
+            // 外側の円より外なら反応させない
+            if (!isInsideJoystickCircle(event)) {
                 return;
             }
 
             event.preventDefault();
 
-            activePointerId = event.pointerId;
+            activePointerId =
+                event.pointerId;
 
-            joystickZone.setPointerCapture(
+            joystickBase.setPointerCapture(
                 event.pointerId
             );
 
-            joystickZone.classList.add(
+            joystickBase.style.cursor =
+                "grabbing";
+
+            joystickZone?.classList.add(
                 "is-active"
             );
 
+            updateAutoButton();
             updateJoystick(event);
         }
     );
 
-    joystickZone?.addEventListener(
+    joystickBase?.addEventListener(
         "pointermove",
         (event) => {
-
             if (
                 autoIsRunning ||
-                activePointerId !== event.pointerId
+                activePointerId !==
+                    event.pointerId
             ) {
                 return;
             }
 
             event.preventDefault();
+
+            /*
+             * 円内から操作を始めた後は、指が円外へ出ても
+             * 最大位置に固定しながら追従する。
+             */
             updateJoystick(event);
         }
     );
 
     function finishJoystick(event) {
-
         if (
             activePointerId !== null &&
-            activePointerId !== event.pointerId
+            activePointerId !==
+                event.pointerId
         ) {
             return;
         }
 
         if (
-            joystickZone &&
-            joystickZone.hasPointerCapture(
+            joystickBase &&
+            joystickBase.hasPointerCapture(
                 event.pointerId
             )
         ) {
-            joystickZone.releasePointerCapture(
+            joystickBase.releasePointerCapture(
                 event.pointerId
             );
+        }
+
+        if (joystickBase) {
+            joystickBase.style.cursor =
+                "grab";
         }
 
         resetJoystick(true);
     }
 
-    joystickZone?.addEventListener(
+    joystickBase?.addEventListener(
         "pointerup",
         finishJoystick
     );
 
-    joystickZone?.addEventListener(
+    joystickBase?.addEventListener(
         "pointercancel",
         finishJoystick
     );
 
-    joystickZone?.addEventListener(
+    joystickBase?.addEventListener(
         "lostpointercapture",
         () => {
             if (activePointerId !== null) {
+                if (joystickBase) {
+                    joystickBase.style.cursor =
+                        "grab";
+                }
+
                 resetJoystick(true);
             }
         }
@@ -700,7 +799,8 @@ function initializeController(ros) {
         () => {
             if (
                 !autoIsRunning &&
-                document.visibilityState !== "visible"
+                document.visibilityState !==
+                    "visible"
             ) {
                 resetJoystick(true);
             }
@@ -716,8 +816,10 @@ function initializeController(ros) {
     updateAutoButton();
     updateManualDisplay();
 
-    // 初期状態は手動スティックを表示
+    // 起動直後はジョイスティックを表示
     setRightPanelMode("manual");
 
-    console.log("通常時ジョイスティック表示Controllerを初期化しました");
+    console.log(
+        "ジョイスティックの円形判定を有効にしました"
+    );
 }

@@ -8,7 +8,7 @@
 
   <title>綺矢李射くん</title>
 
-  <link rel="stylesheet" href="./style.css?v=20260710-canvas-fix2">
+  <link rel="stylesheet" href="./style.css?v=20260710-mobile-sheet-map">
 </head>
 
 <body>
@@ -333,25 +333,103 @@
     let startOffset = 0;
     let currentOffset = 0;
 
+    function getClosedVisibleHeight() {
+      const cssValue = getComputedStyle(bottomSheet)
+        .getPropertyValue("--sheet-collapsed-height")
+        .trim();
+
+      const parsedValue = Number.parseFloat(cssValue);
+
+      if (Number.isFinite(parsedValue) && parsedValue > 0) {
+        return Math.min(bottomSheet.offsetHeight, parsedValue);
+      }
+
+      return Math.min(bottomSheet.offsetHeight, 142);
+    }
+
     function getClosedOffset() {
-      const visibleHeight = 142;
-      return Math.max(0, bottomSheet.offsetHeight - visibleHeight);
+      return Math.max(
+        0,
+        bottomSheet.offsetHeight - getClosedVisibleHeight()
+      );
+    }
+
+    /*
+     * ボトムシートが上がった分だけマップの中心も上へ移動させる。
+     * シートで隠れていない領域の中央に、マップの中心が来るように
+     * 表示中のシート高さの半分だけ上へ動かす。
+     */
+    function updateMapPositionForSheet(offset) {
+      if (!mobileMedia.matches) {
+        document.documentElement.style.removeProperty(
+          "--mobile-sheet-visible-height"
+        );
+        document.documentElement.style.removeProperty(
+          "--mobile-map-shift"
+        );
+        return;
+      }
+
+      const maxOffset = getClosedOffset();
+      const safeOffset = Math.min(
+        maxOffset,
+        Math.max(0, Number(offset) || 0)
+      );
+
+      const visibleHeight = Math.max(
+        0,
+        bottomSheet.offsetHeight - safeOffset
+      );
+
+      const mapShift = visibleHeight / 2;
+
+      document.documentElement.style.setProperty(
+        "--mobile-sheet-visible-height",
+        `${visibleHeight}px`
+      );
+
+      document.documentElement.style.setProperty(
+        "--mobile-map-shift",
+        `${mapShift}px`
+      );
+    }
+
+    function syncSheetAndMap() {
+      if (!mobileMedia.matches) {
+        bottomSheet.style.removeProperty("transform");
+        updateMapPositionForSheet(0);
+        return;
+      }
+
+      const offset = bottomSheet.classList.contains("is-expanded")
+        ? 0
+        : getClosedOffset();
+
+      updateMapPositionForSheet(offset);
     }
 
     function setSheetExpanded(expanded) {
       bottomSheet.classList.toggle("is-expanded", expanded);
       bottomSheet.style.removeProperty("transform");
       bottomSheet.classList.remove("is-dragging");
+      document.body.classList.remove("sheet-dragging");
+
       sheetToggle.textContent = expanded ? "閉じる" : "詳細";
       sheetToggle.setAttribute("aria-expanded", String(expanded));
       document.body.classList.toggle("sheet-expanded", expanded);
+
+      requestAnimationFrame(syncSheetAndMap);
     }
 
     function resetSheetForViewport() {
       if (!mobileMedia.matches) {
         setSheetExpanded(false);
         bottomSheet.style.removeProperty("transform");
+        updateMapPositionForSheet(0);
+        return;
       }
+
+      requestAnimationFrame(syncSheetAndMap);
     }
 
     sheetToggle.addEventListener("click", () => {
@@ -373,7 +451,10 @@
       currentOffset = startOffset;
 
       bottomSheet.classList.add("is-dragging");
+      document.body.classList.add("sheet-dragging");
       activeSwipeArea.setPointerCapture(event.pointerId);
+
+      updateMapPositionForSheet(currentOffset);
     }
 
     function moveSheetDrag(event) {
@@ -381,9 +462,13 @@
 
       const maxOffset = getClosedOffset();
       const moved = event.clientY - startY;
-      currentOffset = Math.min(maxOffset, Math.max(0, startOffset + moved));
+      currentOffset = Math.min(
+        maxOffset,
+        Math.max(0, startOffset + moved)
+      );
 
       bottomSheet.style.transform = `translateY(${currentOffset}px)`;
+      updateMapPositionForSheet(currentOffset);
     }
 
     function finishSheetDrag(event) {
@@ -415,6 +500,21 @@
     });
 
     window.addEventListener("resize", resetSheetForViewport);
+    mobileMedia.addEventListener?.("change", resetSheetForViewport);
+
+    /*
+     * controller.js が manual-view / auto-view を切り替えたとき、
+     * シートの高さとマップ位置を再計算する。
+     */
+    const bodyClassObserver = new MutationObserver(() => {
+      requestAnimationFrame(syncSheetAndMap);
+    });
+
+    bodyClassObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
     resetSheetForViewport();
   </script>
 
@@ -423,7 +523,7 @@
     <script src="./scripts/path.js"></script>
     <script src="./scripts/goal.js"></script>
     <script src="./scripts/pose.js"></script>
-    <script src="./scripts/controller.js?v=20260710-auto-manual-switch2"></script>
+    <script src="./scripts/controller.js?v=20260710-circle-hit-mobile-layout"></script>
     <script src="./scripts/script.js"></script>
 </body>
 

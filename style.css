@@ -1322,3 +1322,125 @@ body.auto-view .manual-control-panel {
     height: 100%;
   }
 }
+
+
+/* =========================================================
+   スマホ：手動操作パネルとマップの連動
+   ========================================================= */
+
+:root {
+  --mobile-sheet-visible-height: 142px;
+  --mobile-map-shift: 71px;
+}
+
+@media screen and (max-width: 900px) {
+
+  /* 通常の閉じた高さ */
+  .side {
+    --sheet-collapsed-height: 142px;
+  }
+
+  /*
+   * ボトムシートが上がるほど、マップも同時に上へ移動する。
+   * シートに隠れていない部分の中央へ地図を合わせるため、
+   * 表示中のシート高さの半分だけ移動する。
+   */
+  .map-panel {
+    transform: translate3d(
+      0,
+      calc(-1 * var(--mobile-map-shift)),
+      0
+    );
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  body.sheet-dragging .map-panel {
+    transition: none;
+  }
+
+  /* 現在地ボタンもシートのすぐ上へ移動 */
+  .map-location-btn {
+    bottom: calc(
+      var(--mobile-sheet-visible-height) +
+      14px +
+      env(safe-area-inset-bottom)
+    );
+  }
+
+  body.sheet-expanded .map-location-btn {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  /* 手動操作時は、展開後もマップが十分見える高さにする */
+  body.manual-view .side {
+    height: min(72vh, 620px);
+    height: min(72dvh, 620px);
+  }
+
+  /*
+   * 閉じているときは従来どおり概要を表示。
+   * 手動操作で上まで開いたときだけ概要欄を消して、
+   * ジョイスティックをすぐ上へ配置する。
+   */
+  body.manual-view .side.is-expanded .sheet-summary {
+    display: none;
+  }
+
+  body.manual-view .side.is-expanded .manual-control-panel {
+    padding-top: 0;
+  }
+
+  /* 手動カード内の順番：見出し → ジョイスティック → 説明文 */
+  body.manual-view .manual-control-header {
+    order: 1;
+  }
+
+  body.manual-view .joystick-zone {
+    order: 2;
+    flex: 0 0 auto;
+    width: min(100%, 320px);
+    height: clamp(230px, 32dvh, 290px);
+    min-height: 230px;
+    margin: 4px auto 8px;
+  }
+
+  body.manual-view .manual-control-description {
+    order: 3;
+    margin-top: 4px;
+    margin-bottom: 10px;
+  }
+
+  body.manual-view .manual-axis-values {
+    order: 4;
+  }
+
+  body.manual-view .manual-control-note {
+    order: 5;
+  }
+
+  body.manual-view .manual-control-card {
+    min-height: 0;
+    overflow-y: auto;
+    padding-top: 12px;
+  }
+}
+
+@media screen and (max-width: 390px) {
+  body.manual-view .side {
+    height: min(74vh, 560px);
+    height: min(74dvh, 560px);
+  }
+
+  body.manual-view .joystick-zone {
+    height: 225px;
+    min-height: 225px;
+  }
+
+  body.manual-view .manual-control-description {
+    font-size: 10px;
+    line-height: 1.45;
+  }
+}
