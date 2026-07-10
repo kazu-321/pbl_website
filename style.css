@@ -656,7 +656,7 @@ body.light-mode .map-location-btn {
     align-items: center;
     flex: 0 0 28px;
     cursor: grab;
-    touch-action: none;
+    touch-action: pan-y;
     user-select: none;
     -webkit-user-select: none;
   }
@@ -1346,11 +1346,9 @@ body.auto-view .manual-control-panel {
    * 表示中のシート高さの半分だけ移動する。
    */
   .map-panel {
-    transform: translate3d(
-      0,
-      calc(-1 * var(--mobile-map-shift)),
-      0
-    );
+    transform: translate3d(0,
+        calc(-1 * var(--mobile-map-shift)),
+        0);
     transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
   }
@@ -1361,11 +1359,7 @@ body.auto-view .manual-control-panel {
 
   /* 現在地ボタンもシートのすぐ上へ移動 */
   .map-location-btn {
-    bottom: calc(
-      var(--mobile-sheet-visible-height) +
-      14px +
-      env(safe-area-inset-bottom)
-    );
+    bottom: calc(var(--mobile-sheet-visible-height) + 14px + env(safe-area-inset-bottom));
   }
 
   body.sheet-expanded .map-location-btn {
@@ -1442,5 +1436,73 @@ body.auto-view .manual-control-panel {
   body.manual-view .manual-control-description {
     font-size: 10px;
     line-height: 1.45;
+  }
+}
+
+/* =========================================================
+   スマホ手動操作時
+   ボトムシートが赤線付近より上へ来ないようにする
+   ========================================================= */
+
+@media screen and (max-width: 900px) {
+
+  /*
+   * 手動操作中のボトムシートの最大高さ
+   *
+   * 画面下から約56%の高さまでに制限するため、
+   * 上側に約44%のマップ領域が残る
+   */
+  body.manual-view #bottom-sheet {
+    height: 56vh !important;
+    height: min(56dvh, 560px) !important;
+  }
+
+  /*
+   * シートを低くした分、中身が入りきらない場合は
+   * ジョイスティック部分だけ縦スクロールできる
+   */
+  body.manual-view .manual-control-panel {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /*
+   * 操作ボタンはシートの下部に固定して残す
+   */
+  body.manual-view .controls {
+    flex-shrink: 0;
+  }
+}
+
+/* =========================================================
+   スマホ手動操作時
+   ジョイスティック円の外側はスクロールできるようにする
+   ========================================================= */
+
+@media screen and (max-width: 900px) {
+
+  /* ジョイスティック全体のエリアは縦スクロールを許可 */
+  .joystick-zone {
+    touch-action: pan-y;
+    position: relative;
+  }
+
+  /*
+   * 前進・後退・左旋回・右旋回 の文字は
+   * スクロール操作を邪魔しないようにする
+   */
+  .joystick-label {
+    pointer-events: none;
+  }
+
+  /*
+   * 実際にジョイスティックとして反応するのは
+   * この円の部分だけ
+   */
+  .joystick-base {
+    touch-action: none;
+    pointer-events: auto;
   }
 }
