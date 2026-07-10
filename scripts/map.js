@@ -313,6 +313,58 @@ function fitMapToScreen() {
     );
 }
 
+// ==============================
+// Robot Follow
+// ==============================
+
+function updateCamera() {
+
+    if (!followRobot) {
+        return;
+    }
+
+    if (!robotPose || !occupancyGrid) {
+        return;
+    }
+
+    const resolution =
+        occupancyGrid.info.resolution;
+
+    const mapHeight =
+        occupancyGrid.info.height;
+
+    const originY =
+        occupancyGrid.info.origin.position.y;
+
+    const worldHeight =
+        mapHeight * resolution;
+
+    const originX =
+        occupancyGrid.info.origin.position.x;
+
+    const worldWidth =
+        occupancyGrid.info.width *
+        resolution;
+
+    const x =
+        robotPose.pose.position.x;
+
+    const y =
+        robotPose.pose.position.y;
+
+    const correctedX =
+        originX +
+        worldWidth -
+        (x - originX);
+
+    const correctedY =
+        originY +
+        worldHeight -
+        (y - originY);
+
+    cameraX = correctedX;
+    cameraY = correctedY;
+}
 
 // ==============================
 // Draw Map
@@ -782,7 +834,8 @@ mapLocationButton?.addEventListener(
          * 現在地ボタンを押したとき、
          * 地図全体を中央へ戻す
          */
-        fitMapToScreen();
+        followRobot = true;
+        updateCamera();
     }
 );
 
