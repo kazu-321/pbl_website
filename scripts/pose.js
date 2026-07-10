@@ -42,38 +42,27 @@ function drawRobot() {
     const originY = occupancyGrid.info.origin.position.y;
     const worldHeight = mapHeight * resolution;
 
+    const originX = occupancyGrid.info.origin.position.x;
+    const worldWidth = occupancyGrid.info.width * resolution;
+
     const x = robotPose.pose.position.x;
     const y = robotPose.pose.position.y;
 
-    // Map表示用にY反転
-    const correctedY =
-        originY +
-        worldHeight -
-        (y - originY);
-
-    const originX =
-        occupancyGrid.info.origin.position.x;
-
-    const worldWidth =
-        occupancyGrid.info.width *
-        occupancyGrid.info.resolution;
-
+    // Map表示用に補正
     const correctedX =
         originX +
         worldWidth -
         (x - originX);
 
-    const screenX =
-        mapToScreenX(correctedX);
-        
+    const correctedY =
+        originY +
+        worldHeight -
+        (y - originY);
+
+    const screenX = mapToScreenX(correctedX);
     const screenY = mapToScreenY(correctedY);
 
-    // 自己位置
-    // ==============================
-    // ロボット（四角＋矢印）
-    // ==============================
-
-    // ロボットの向き（Quaternion → Yaw）
+    // Quaternion → Yaw
     const q = robotPose.pose.orientation;
 
     const yaw = Math.atan2(
@@ -81,7 +70,14 @@ function drawRobot() {
         1 - 2 * (q.y * q.y + q.z * q.z)
     );
 
-    // 描画位置へ移動
+    // ==============================
+    // アイコンサイズ
+    // 地図セル5個分
+    // ==============================
+
+    const robotSize = zoom * 0.5;
+    const arrowSize = robotSize * 0.35;
+
     ctx.save();
 
     ctx.translate(
@@ -89,7 +85,6 @@ function drawRobot() {
         screenY
     );
 
-    // 向きを反映
     ctx.rotate(-yaw + Math.PI / 2);
 
     // ------------------------------
@@ -99,20 +94,20 @@ function drawRobot() {
     ctx.fillStyle = "#0066ff";
 
     ctx.fillRect(
-        -10,
-        -10,
-        20,
-        20
+        -robotSize / 2,
+        -robotSize / 2,
+        robotSize,
+        robotSize
     );
 
     ctx.lineWidth = 2;
     ctx.strokeStyle = "white";
 
     ctx.strokeRect(
-        -10,
-        -10,
-        20,
-        20
+        -robotSize / 2,
+        -robotSize / 2,
+        robotSize,
+        robotSize
     );
 
     // ------------------------------
@@ -121,15 +116,21 @@ function drawRobot() {
 
     ctx.beginPath();
 
-    ctx.moveTo(0, -6);
+    ctx.moveTo(0, -arrowSize);
 
-    ctx.lineTo(0, 6);
+    ctx.lineTo(0, arrowSize);
 
-    ctx.lineTo(6, 2);
+    ctx.lineTo(
+        arrowSize * 0.6,
+        arrowSize * 0.4
+    );
 
-    ctx.moveTo(0, 6);
+    ctx.moveTo(0, arrowSize);
 
-    ctx.lineTo(-6, 2);
+    ctx.lineTo(
+        -arrowSize * 0.6,
+        arrowSize * 0.4
+    );
 
     ctx.strokeStyle = "white";
     ctx.lineWidth = 2;
@@ -137,4 +138,4 @@ function drawRobot() {
     ctx.stroke();
 
     ctx.restore();
-    }
+}
