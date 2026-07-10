@@ -139,21 +139,6 @@ body {
   overflow: hidden;
 }
 
-#canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  touch-action: none;
-  overscroll-behavior: none;
-  user-select: none;
-  -webkit-user-select: none;
-  cursor: grab;
-}
-
-#canvas.is-dragging {
-  cursor: grabbing;
-}
-
 .map {
   width: 100%;
   height: 100%;
@@ -863,4 +848,477 @@ body.light-mode,
 body.light-mode .app,
 body.light-mode .main {
   background: #f3f6fb !important;
+}
+
+/* =========================================================
+   手動モード・ジョイスティック
+   ========================================================= */
+
+button.menu-item {
+  width: 100%;
+  border: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.menu-mode-item {
+  margin-top: 18px;
+}
+
+.menu-mode-item.active {
+  background: linear-gradient(90deg, #3b82f6, #7c3aed);
+  color: white;
+}
+
+.manual-control-panel {
+  grid-area: side;
+  display: none;
+  min-width: 0;
+  min-height: 0;
+}
+
+body.manual-mode .side-cards {
+  display: none;
+}
+
+body.manual-mode .manual-control-panel {
+  display: block;
+}
+
+.manual-control-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 18px;
+  overflow: hidden;
+}
+
+.manual-control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.manual-control-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.manual-control-eyebrow {
+  margin-bottom: 4px;
+  color: #7f8ba3;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.manual-mode-badge {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.14);
+  color: #93c5fd;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.manual-control-description {
+  margin-top: 10px;
+  color: #9ba6bb;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.joystick-zone {
+  position: relative;
+  flex: 1 1 auto;
+  width: min(100%, 300px);
+  min-height: 250px;
+  max-height: 360px;
+  margin: 8px auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.joystick-zone.is-active {
+  cursor: grabbing;
+}
+
+.joystick-base {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(74%, 230px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(99, 102, 241, 0.18), transparent 54%),
+    rgba(15, 23, 42, 0.72);
+  box-shadow:
+    inset 0 0 38px rgba(0, 0, 0, 0.34),
+    0 16px 40px rgba(0, 0, 0, 0.26);
+}
+
+.joystick-base::before,
+.joystick-base::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: rgba(148, 163, 184, 0.15);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.joystick-base::before {
+  width: 78%;
+  height: 1px;
+}
+
+.joystick-base::after {
+  width: 1px;
+  height: 78%;
+}
+
+.joystick-stick {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #438cf5, #6d45e9);
+  box-shadow:
+    0 12px 26px rgba(37, 99, 235, 0.34),
+    inset 0 1px 1px rgba(255, 255, 255, 0.32);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.joystick-stick span {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.74);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.08);
+}
+
+.joystick-zone.is-active .joystick-stick {
+  box-shadow:
+    0 14px 34px rgba(59, 130, 246, 0.48),
+    0 0 0 8px rgba(59, 130, 246, 0.09),
+    inset 0 1px 1px rgba(255, 255, 255, 0.32);
+}
+
+.joystick-label {
+  position: absolute;
+  color: #7f8ba3;
+  font-size: 10px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.joystick-label-up {
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.joystick-label-right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.joystick-label-down {
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.joystick-label-left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.manual-axis-values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.manual-axis-item {
+  min-width: 0;
+}
+
+.manual-axis-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+  color: #9ba6bb;
+  font-size: 11px;
+}
+
+.manual-axis-heading strong {
+  color: #e5e7eb;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.manual-axis-track {
+  position: relative;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.14);
+}
+
+.manual-axis-track::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.manual-axis-track span {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transition: width 0.04s linear, left 0.04s linear;
+}
+
+.manual-control-note {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.16);
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.07);
+  color: #d6b36d;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+#auto-toggle-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+}
+
+body.light-mode .menu-mode-item.active {
+  background: linear-gradient(90deg, #3b82f6, #7c3aed);
+  color: white;
+}
+
+body.light-mode .manual-control-description,
+body.light-mode .manual-axis-heading,
+body.light-mode .joystick-label,
+body.light-mode .manual-control-eyebrow {
+  color: #64748b;
+}
+
+body.light-mode .manual-axis-heading strong {
+  color: #0f172a;
+}
+
+body.light-mode .joystick-base {
+  border-color: rgba(15, 23, 42, 0.12);
+  background:
+    radial-gradient(circle at 50% 44%, rgba(99, 102, 241, 0.12), transparent 54%),
+    #eef2f7;
+  box-shadow:
+    inset 0 0 34px rgba(15, 23, 42, 0.08),
+    0 16px 36px rgba(15, 23, 42, 0.12);
+}
+
+body.light-mode .joystick-base::before,
+body.light-mode .joystick-base::after {
+  background: rgba(15, 23, 42, 0.13);
+}
+
+body.light-mode .manual-axis-track {
+  background: rgba(15, 23, 42, 0.1);
+}
+
+body.light-mode .manual-axis-track::after {
+  background: rgba(15, 23, 42, 0.28);
+}
+
+body.light-mode .manual-control-note {
+  color: #9a6700;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+@media screen and (max-width: 900px) {
+  body.manual-mode .manual-control-panel {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 14px 10px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .manual-control-card {
+    flex: 1 0 auto;
+    min-height: 500px;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .manual-control-header h2 {
+    font-size: 19px;
+  }
+
+  .joystick-zone {
+    flex: 0 0 auto;
+    width: min(100%, 320px);
+    min-height: 280px;
+    height: 280px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  .joystick-base {
+    width: min(70%, 220px);
+  }
+
+  .joystick-stick {
+    width: 78px;
+    height: 78px;
+  }
+}
+
+@media screen and (max-width: 390px) {
+  .manual-control-description {
+    font-size: 11px;
+  }
+
+  .joystick-zone {
+    min-height: 245px;
+    height: 245px;
+  }
+
+  .joystick-base {
+    width: min(68%, 190px);
+  }
+
+  .joystick-stick {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+
+/* =========================================================
+   自動運転前はジョイスティック、自動運転中は情報カード
+   controller.js が body に manual-view / auto-view を付けて切り替えます
+   ========================================================= */
+
+.manual-control-panel {
+  grid-area: side;
+  display: none;
+  min-width: 0;
+  min-height: 0;
+}
+
+body.manual-view .side-cards {
+  display: none !important;
+}
+
+body.manual-view .manual-control-panel {
+  display: block !important;
+}
+
+body.auto-view .side-cards {
+  display: flex !important;
+}
+
+body.auto-view .manual-control-panel {
+  display: none !important;
+}
+
+/* =========================================================
+   マップCanvasをマップ領域いっぱいに表示
+   ========================================================= */
+
+.map-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+
+  display: block;
+  width: calc(100% - 28px);
+  height: calc(100% - 28px);
+
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+#canvas.is-dragging {
+  cursor: grabbing;
+}
+
+@media screen and (max-width: 900px) {
+  body.manual-view .manual-control-panel {
+    display: flex !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 14px 10px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body.manual-view .side-cards {
+    display: none !important;
+  }
+
+  body.auto-view .side-cards {
+    display: flex !important;
+  }
+
+  body.auto-view .manual-control-panel {
+    display: none !important;
+  }
+
+  #canvas {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
