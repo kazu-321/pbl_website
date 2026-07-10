@@ -63,6 +63,8 @@ function draw() {
         canvas.height
     );
 
+    updateCamera();
+
     drawMap();
 
     drawPath();
