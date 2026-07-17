@@ -60,5 +60,17 @@
             "yaw": 90,
             "estimatedTime": "約2分"
         }
+        {
+            "id": "PBL room",
+            "name": "実験室前",
+            "description": "実験室前",
+            "position": {
+                "x": 4.2,
+                "y": 1.9,
+                "z": 0.0
+            },
+            "yaw": 90,
+            "estimatedTime": "約2分"
+        }
     ]
 }
