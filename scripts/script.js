@@ -147,6 +147,7 @@ ros.on("connection", () => {
     subscribeMap();
     subscribePath();
     subscribePose();
+    subscribeSpeed();
 });
 
 
