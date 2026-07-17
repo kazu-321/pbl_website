@@ -1526,3 +1526,63 @@ body.auto-view .manual-control-panel {
     pointer-events: auto;
   }
 }
+
+/* =========================================================
+   PC版：目的地一覧をスクロール可能にする
+   ========================================================= */
+
+@media screen and (min-width: 901px) {
+
+  /* 右側全体を画面の高さ以内に収める */
+  .side-cards {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* 目的地カードに残りの高さを割り当てる */
+  .destination-card {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+
+  /* 見出しをスクロール中も上部に残す */
+  .destination-card>h2 {
+    position: sticky;
+    top: -12px;
+    z-index: 2;
+
+    margin: -12px -12px 10px;
+    padding: 12px 12px 10px;
+
+    background: #111827;
+  }
+
+  /* スクロールバーを細くする */
+  .destination-card {
+    scrollbar-width: thin;
+    scrollbar-color:
+      rgba(148, 163, 184, 0.5) transparent;
+  }
+
+  .destination-card::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  .destination-card::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .destination-card::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.5);
+  }
+
+  /* ライトモード */
+  body.light-mode .destination-card>h2 {
+    background: white;
+  }
+}
