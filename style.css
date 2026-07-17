@@ -1526,3 +1526,189 @@ body.auto-view .manual-control-panel {
     pointer-events: auto;
   }
 }
+
+/* =========================================================
+   手動操作画面をコンパクトにする
+   説明文を消してジョイスティック全体を見えるようにする
+   ========================================================= */
+
+/* 説明文を非表示 */
+.manual-control-description {
+  display: none !important;
+}
+
+/* 見出し下の余白を小さくする */
+.manual-control-header {
+  margin-bottom: 4px !important;
+}
+
+/* ジョイスティックを少し上へ詰める */
+.joystick-zone {
+  margin-top: 0 !important;
+}
+
+/* カード内の上下余白を調整 */
+.manual-control-card {
+  padding-top: 18px !important;
+  padding-bottom: 18px !important;
+}
+
+/* スマホ表示 */
+@media screen and (max-width: 900px) {
+
+  body.manual-view .manual-control-card {
+    padding-top: 14px !important;
+    padding-bottom: 16px !important;
+  }
+
+  body.manual-view .manual-control-header {
+    margin-bottom: 0 !important;
+  }
+
+  body.manual-view .joystick-zone {
+    margin-top: -6px !important;
+  }
+}
+
+/* ジョイスティック下の「前後・旋回」の数値表示を消す */
+.manual-axis-values {
+  display: none !important;
+}
+
+/* 消した分、カード下側の余白を小さくする */
+.manual-control-card {
+  padding-bottom: 12px !important;
+}
+
+/* =========================================================
+   ジョイスティックの前進・後退ラベルを円から離す
+   ========================================================= */
+
+.joystick-label-up {
+  top: -10px !important;
+  transform: translateX(-50%) !important;
+}
+
+.joystick-label-down {
+  bottom: -10px !important;
+  transform: translateX(-50%) !important;
+}
+
+/* ラベルがカード内で切れないようにする */
+.joystick-zone {
+  overflow: visible !important;
+}
+
+/* =========================================================
+   スマホ手動操作画面
+   ジョイスティック以外をスワイプすると目的地までスクロール
+   ========================================================= */
+
+@media screen and (max-width: 900px) {
+
+  /* 黄色い安全メッセージを消す */
+  .manual-control-note {
+    display: none !important;
+  }
+
+  /*
+   * 手動操作カード自体には
+   * 独立したスクロールを持たせない
+   */
+  .manual-control-card {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    max-height: none !important;
+
+    padding-bottom: 16px !important;
+
+    overflow: visible !important;
+    overflow-y: visible !important;
+
+    touch-action: pan-y;
+  }
+
+  /*
+   * ジョイスティックと目的地一覧を含む
+   * 外側のパネルだけをスクロール領域にする
+   */
+  body.manual-view .manual-control-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+
+    padding-bottom: 18px !important;
+  }
+
+  /*
+   * ジョイスティックの四角い領域全体では
+   * 縦スクロールを許可する
+   */
+  .joystick-zone {
+    overflow: visible !important;
+    touch-action: pan-y !important;
+  }
+
+  /*
+   * 前進・後退・左右旋回の文字は
+   * スクロール操作を邪魔しない
+   */
+  .joystick-label {
+    pointer-events: none !important;
+  }
+
+  /*
+   * 実際にロボットを操作するのは
+   * 外側の円の中だけ
+   */
+  .joystick-base {
+    touch-action: none !important;
+    pointer-events: auto !important;
+  }
+
+  /*
+   * ジョイスティックの下にある
+   * 目的地カードを通常のスクロール内容として配置
+   */
+  .manual-destination-slot {
+    display: block !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    padding-bottom: 12px !important;
+
+    overflow: visible !important;
+    touch-action: pan-y;
+  }
+
+  .manual-destination-slot .destination-card {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+
+    overflow: visible !important;
+    touch-action: pan-y;
+  }
+
+  /*
+   * スクロールバーは見えなくするが、
+   * スクロール自体は可能
+   */
+  body.manual-view .manual-control-panel {
+    scrollbar-width: none;
+  }
+
+  body.manual-view .manual-control-panel::-webkit-scrollbar {
+    display: none;
+  }
+}
