@@ -77,8 +77,8 @@ function initializeController(ros) {
     // 中央付近の小さな入力を0として扱う
     const DEAD_ZONE = 0.08;
 
-    // 手動操作値の送信周期（50ms = 20Hz）
-    const PUBLISH_INTERVAL = 50;
+    // 手動操作値の送信周期（30ms = 33.3Hz）
+    const PUBLISH_INTERVAL = 30;
 
     // /controller/joy のボタン番号
     const POWER_STOP_BUTTON = 0;

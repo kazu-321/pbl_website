@@ -1528,66 +1528,130 @@ body.auto-view .manual-control-panel {
 }
 
 /* =========================================================
-
-   PC版：目的地一覧をスクロール可能にする
+   PC版：目的地カード内だけをスクロールする
    ========================================================= */
 
 @media screen and (min-width: 901px) {
 
-  /* 右側全体を画面の高さ以内に収める */
-  .side-cards {
+  /*
+   * ジョイスティックと目的地カードを
+   * それぞれ独立させて重ならないようにする
+   */
+  body.manual-view .manual-control-panel {
+    display: grid !important;
+    grid-template-rows: auto minmax(180px, 1fr);
+    align-content: start;
+    gap: 12px;
+
+    width: 100%;
+    height: 100%;
     min-height: 0;
-    overflow: hidden;
+
+    overflow: hidden !important;
   }
 
-  /* 目的地カードに残りの高さを割り当てる */
-  .destination-card {
-    flex: 1 1 auto;
+  /* 手動操作カードは現在の大きさを維持 */
+  body.manual-view .manual-control-card {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    flex: 0 0 auto !important;
+
+    overflow: hidden !important;
+  }
+
+  /*
+   * 目的地カード用の領域を
+   * ジョイスティックの下へ固定する
+   */
+  body.manual-view .manual-destination-slot {
+    display: block !important;
+    width: 100%;
     min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
+    max-height: 300px;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  /*
+   * 目的地カードの外枠はそのままにして、
+   * カードの中だけスクロールさせる
+   */
+  body.manual-view .manual-destination-slot .destination-card {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+    max-height: 300px;
+    min-height: 0;
+    margin: 0 !important;
+    padding: 12px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
   }
 
-  /* 見出しをスクロール中も上部に残す */
-  .destination-card>h2 {
+  /* 「目的地を選択」はスクロールしても上に残す */
+  body.manual-view .manual-destination-slot .destination-card>h2 {
     position: sticky;
     top: -12px;
     z-index: 2;
 
-    margin: -12px -12px 10px;
-    padding: 12px 12px 10px;
+    flex: 0 0 auto;
+    margin: -12px -12px 8px;
+    padding: 12px 12px 8px;
 
     background: #111827;
   }
 
-  /* スクロールバーを細くする */
-  .destination-card {
+  /* 目的地の各項目だけをコンパクトにする */
+  body.manual-view .manual-destination-slot .destination {
+    flex: 0 0 auto;
+
+    min-height: 38px !important;
+    padding: 7px 12px !important;
+    margin-bottom: 5px !important;
+
+    border-radius: 14px;
+    font-size: 14px !important;
+  }
+
+  body.manual-view .manual-destination-slot .destination:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* スクロールバー */
+  body.manual-view .manual-destination-slot .destination-card {
     scrollbar-width: thin;
     scrollbar-color:
       rgba(148, 163, 184, 0.5) transparent;
   }
 
-  .destination-card::-webkit-scrollbar {
+  body.manual-view .manual-destination-slot .destination-card::-webkit-scrollbar {
     width: 7px;
   }
 
-  .destination-card::-webkit-scrollbar-track {
+  body.manual-view .manual-destination-slot .destination-card::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  .destination-card::-webkit-scrollbar-thumb {
+  body.manual-view .manual-destination-slot .destination-card::-webkit-scrollbar-thumb {
     border-radius: 999px;
     background: rgba(148, 163, 184, 0.5);
   }
 
   /* ライトモード */
-  body.light-mode .destination-card>h2 {
-    background: white;  
+  body.light-mode.manual-view .manual-destination-slot .destination-card>h2 {
+    background: white;
   }
 }
-   /* =====================================================
+
+/* =====================================================
        手動操作画面をコンパクトにする
        説明文を消してジョイスティック全体を見えるようにする
    ========================================================= */
@@ -1770,5 +1834,264 @@ body.auto-view .manual-control-panel {
 
   body.manual-view .manual-control-panel::-webkit-scrollbar {
     display: none;
+  }
+}
+/* =========================================================
+   手動操作・目的地選択の最終調整
+   ========================================================= */
+
+/* 黄色い注意文を消す */
+.manual-control-note {
+  display: none !important;
+}
+
+
+/* =========================================================
+   PC版
+   手動操作と目的地選択を同じ高さにする
+   ========================================================= */
+
+@media screen and (min-width: 901px) {
+
+  body.manual-view .manual-control-panel {
+    --manual-section-height:
+      clamp(
+        260px,
+        calc((100dvh - 190px) / 2),
+        350px
+      );
+
+    display: grid !important;
+    grid-template-rows:
+      var(--manual-section-height)
+      var(--manual-section-height);
+
+    align-content: start !important;
+    gap: 12px;
+
+    width: 100%;
+    height: auto !important;
+    min-height: 0;
+
+    overflow: hidden !important;
+  }
+
+
+  /* 上半分：手動操作 */
+  body.manual-view .manual-control-card {
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100%;
+    height: var(--manual-section-height) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding: 14px !important;
+    overflow: hidden !important;
+  }
+
+  body.manual-view .manual-control-header {
+    flex: 0 0 auto;
+    margin-bottom: 0 !important;
+  }
+
+  body.manual-view .joystick-zone {
+    flex: 1 1 auto !important;
+
+    width: min(100%, 360px) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 auto !important;
+    overflow: visible !important;
+  }
+
+  body.manual-view .joystick-base {
+    width: min(72%, 225px) !important;
+  }
+
+  body.manual-view .joystick-stick {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+
+  /* 下半分：目的地選択 */
+  body.manual-view .manual-destination-slot {
+    display: block !important;
+
+    width: 100%;
+    height: var(--manual-section-height) !important;
+    min-height: 0 !important;
+
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body.manual-view
+  .manual-destination-slot
+  .destination-card {
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100%;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 12px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+
+  body.manual-view
+  .manual-destination-slot
+  .destination-card > h2 {
+    position: sticky;
+    top: -12px;
+    z-index: 2;
+
+    margin: -12px -12px 8px;
+    padding: 12px 12px 8px;
+
+    background: #111827;
+  }
+
+  body.light-mode.manual-view
+  .manual-destination-slot
+  .destination-card > h2 {
+    background: white;
+  }
+
+  body.manual-view
+  .manual-destination-slot
+  .destination {
+    flex: 0 0 auto;
+
+    min-height: 38px !important;
+    padding: 7px 12px !important;
+    margin-bottom: 5px !important;
+
+    font-size: 14px !important;
+  }
+}
+
+
+/* =========================================================
+   スマホ版
+   手動操作をコンパクトにして目的地までスクロール可能
+   ========================================================= */
+
+@media screen and (max-width: 900px) {
+
+  body.manual-view .manual-control-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+
+    min-height: 0 !important;
+    gap: 12px;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body.manual-view .manual-control-card {
+    display: flex !important;
+    flex-direction: column !important;
+
+    flex: 0 0 auto !important;
+
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding: 10px 14px 14px !important;
+
+    overflow: visible !important;
+  }
+
+  body.manual-view .manual-control-header {
+    flex: 0 0 auto;
+    margin-bottom: 0 !important;
+  }
+
+  body.manual-view .joystick-zone {
+    flex: 0 0 auto !important;
+
+    width: min(100%, 280px) !important;
+    height: 240px !important;
+    min-height: 240px !important;
+    max-height: 240px !important;
+
+    margin: 0 auto 4px !important;
+
+    overflow: visible !important;
+    touch-action: pan-y !important;
+  }
+
+  body.manual-view .joystick-base {
+    width: 185px !important;
+
+    touch-action: none !important;
+    pointer-events: auto !important;
+  }
+
+  body.manual-view .joystick-stick {
+    width: 68px !important;
+    height: 68px !important;
+  }
+
+  body.manual-view .manual-destination-slot {
+    display: block !important;
+    flex: 0 0 auto !important;
+
+    width: 100%;
+    height: auto !important;
+
+    padding: 0 0 90px !important;
+    overflow: visible !important;
+  }
+
+  body.manual-view
+  .manual-destination-slot
+  .destination-card {
+    width: 100%;
+    height: auto !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+}
+
+
+@media screen and (max-width: 390px) {
+
+  body.manual-view .joystick-zone {
+    height: 220px !important;
+    min-height: 220px !important;
+    max-height: 220px !important;
+  }
+
+  body.manual-view .joystick-base {
+    width: 170px !important;
+  }
+
+  body.manual-view .joystick-stick {
+    width: 62px !important;
+    height: 62px !important;
   }
 }
