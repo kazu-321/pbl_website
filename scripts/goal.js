@@ -1,5 +1,3 @@
-console.log("goal.js pose status version loaded");
-
 // ==============================
 // Goal Publisher
 // manifest.json を唯一の目的地データとして使用する

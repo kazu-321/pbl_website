@@ -1,5 +1,3 @@
-console.log("path.js route information version loaded");
-
 // ==============================
 // Route Settings
 // ==============================

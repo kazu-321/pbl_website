@@ -1,5 +1,3 @@
-console.log("controller.js auto/manual view + circle hit area loaded");
-
 // ==============================
 // Controller
 // ==============================
@@ -36,18 +34,6 @@ function initializeController(ros) {
 
     const joystickStick =
         document.getElementById("joystick-stick");
-
-    const forwardValue =
-        document.getElementById("manual-forward-value");
-
-    const turnValue =
-        document.getElementById("manual-turn-value");
-
-    const forwardBar =
-        document.getElementById("manual-forward-bar");
-
-    const turnBar =
-        document.getElementById("manual-turn-bar");
 
     const sheetEyebrow =
         document.getElementById("sheet-eyebrow");
@@ -468,53 +454,6 @@ function initializeController(ros) {
 
 
     // ==============================
-    // Manual Display
-    // ==============================
-
-    function updateAxisBar(element, value) {
-        if (!element) {
-            return;
-        }
-
-        const normalized =
-            clamp(value, -1, 1);
-
-        const amount =
-            Math.abs(normalized) * 50;
-
-        element.style.width =
-            `${amount}%`;
-
-        element.style.left =
-            normalized >= 0
-                ? "50%"
-                : `${50 - amount}%`;
-    }
-
-    function updateManualDisplay() {
-        if (forwardValue) {
-            forwardValue.textContent =
-                manualForward.toFixed(2);
-        }
-
-        if (turnValue) {
-            turnValue.textContent =
-                manualTurn.toFixed(2);
-        }
-
-        updateAxisBar(
-            forwardBar,
-            manualForward
-        );
-
-        updateAxisBar(
-            turnBar,
-            manualTurn
-        );
-    }
-
-
-    // ==============================
     // Joystick Reset
     // ==============================
 
@@ -532,7 +471,6 @@ function initializeController(ros) {
             "is-active"
         );
 
-        updateManualDisplay();
         updateAutoButton();
 
         if (sendStop) {
@@ -659,7 +597,6 @@ function initializeController(ros) {
         joystickStick.style.transform =
             `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
 
-        updateManualDisplay();
         publishManualAxes();
     }
 
@@ -814,12 +751,7 @@ function initializeController(ros) {
 
     updatePowerButton();
     updateAutoButton();
-    updateManualDisplay();
-
     // 起動直後はジョイスティックを表示
     setRightPanelMode("manual");
 
-    console.log(
-        "ジョイスティックの円形判定を有効にしました"
-    );
 }

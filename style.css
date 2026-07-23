@@ -13,6 +13,8 @@ body {
 :root {
   color-scheme: dark;
   background-color: #050816;
+  --mobile-sheet-visible-height: 142px;
+  --mobile-map-shift: 71px;
 }
 
 :root.light-mode {
@@ -897,14 +899,6 @@ button.menu-item {
   min-height: 0;
 }
 
-body.manual-mode .side-cards {
-  display: none;
-}
-
-body.manual-mode .manual-control-panel {
-  display: block;
-}
-
 .manual-control-card {
   display: flex;
   flex-direction: column;
@@ -944,13 +938,6 @@ body.manual-mode .manual-control-panel {
   color: #93c5fd;
   font-size: 11px;
   font-weight: 800;
-}
-
-.manual-control-description {
-  margin-top: 10px;
-  color: #9ba6bb;
-  font-size: 12px;
-  line-height: 1.6;
 }
 
 .joystick-zone {
@@ -1075,71 +1062,6 @@ body.manual-mode .manual-control-panel {
   transform: translateY(-50%);
 }
 
-.manual-axis-values {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.manual-axis-item {
-  min-width: 0;
-}
-
-.manual-axis-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 7px;
-  color: #9ba6bb;
-  font-size: 11px;
-}
-
-.manual-axis-heading strong {
-  color: #e5e7eb;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-
-.manual-axis-track {
-  position: relative;
-  height: 6px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.14);
-}
-
-.manual-axis-track::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  background: rgba(255, 255, 255, 0.34);
-}
-
-.manual-axis-track span {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 0;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  transition: width 0.04s linear, left 0.04s linear;
-}
-
-.manual-control-note {
-  margin-top: 14px;
-  padding: 10px 12px;
-  border: 1px solid rgba(245, 158, 11, 0.16);
-  border-radius: 12px;
-  background: rgba(245, 158, 11, 0.07);
-  color: #d6b36d;
-  font-size: 10px;
-  line-height: 1.5;
-}
-
 #auto-toggle-btn:disabled {
   cursor: not-allowed;
   opacity: 0.58;
@@ -1151,15 +1073,9 @@ body.light-mode .menu-mode-item.active {
   color: white;
 }
 
-body.light-mode .manual-control-description,
-body.light-mode .manual-axis-heading,
 body.light-mode .joystick-label,
 body.light-mode .manual-control-eyebrow {
   color: #64748b;
-}
-
-body.light-mode .manual-axis-heading strong {
-  color: #0f172a;
 }
 
 body.light-mode .joystick-base {
@@ -1177,92 +1093,9 @@ body.light-mode .joystick-base::after {
   background: rgba(15, 23, 42, 0.13);
 }
 
-body.light-mode .manual-axis-track {
-  background: rgba(15, 23, 42, 0.1);
-}
-
-body.light-mode .manual-axis-track::after {
-  background: rgba(15, 23, 42, 0.28);
-}
-
-body.light-mode .manual-control-note {
-  color: #9a6700;
-  background: rgba(245, 158, 11, 0.08);
-}
-
-@media screen and (max-width: 900px) {
-  body.manual-mode .manual-control-panel {
-    display: flex;
-    flex: 1 1 auto;
-    min-height: 0;
-    padding: 0 14px 10px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .manual-control-card {
-    flex: 1 0 auto;
-    min-height: 500px;
-    padding: 16px;
-    border-radius: 20px;
-  }
-
-  .manual-control-header h2 {
-    font-size: 19px;
-  }
-
-  .joystick-zone {
-    flex: 0 0 auto;
-    width: min(100%, 320px);
-    min-height: 280px;
-    height: 280px;
-    margin-top: 12px;
-    margin-bottom: 12px;
-  }
-
-  .joystick-base {
-    width: min(70%, 220px);
-  }
-
-  .joystick-stick {
-    width: 78px;
-    height: 78px;
-  }
-}
-
-@media screen and (max-width: 390px) {
-  .manual-control-description {
-    font-size: 11px;
-  }
-
-  .joystick-zone {
-    min-height: 245px;
-    height: 245px;
-  }
-
-  .joystick-base {
-    width: min(68%, 190px);
-  }
-
-  .joystick-stick {
-    width: 70px;
-    height: 70px;
-  }
-}
-
-
 /* =========================================================
-   自動運転前はジョイスティック、自動運転中は情報カード
-   controller.js が body に manual-view / auto-view を付けて切り替えます
+   表示モード・マップ
    ========================================================= */
-
-.manual-control-panel {
-  grid-area: side;
-  display: none;
-  min-width: 0;
-  min-height: 0;
-}
 
 body.manual-view .side-cards {
   display: none !important;
@@ -1280,26 +1113,12 @@ body.auto-view .manual-control-panel {
   display: none !important;
 }
 
-/* =========================================================
-   マップCanvasをマップ領域いっぱいに表示
-   ========================================================= */
-
-.map-panel {
-  position: relative;
-  overflow: hidden;
-}
-
 #canvas {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  bottom: 14px;
-  left: 14px;
-
+  inset: 14px;
   display: block;
   width: calc(100% - 28px);
   height: calc(100% - 28px);
-
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
@@ -1310,326 +1129,117 @@ body.auto-view .manual-control-panel {
   cursor: grabbing;
 }
 
-@media screen and (max-width: 900px) {
-  body.manual-view .manual-control-panel {
-    display: flex !important;
-    flex: 1 1 auto;
-    min-height: 0;
-    padding: 0 14px 10px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  body.manual-view .side-cards {
-    display: none !important;
-  }
-
-  body.auto-view .side-cards {
-    display: flex !important;
-  }
-
-  body.auto-view .manual-control-panel {
-    display: none !important;
-  }
-
-  #canvas {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
+.joystick-label-up {
+  top: -10px;
 }
 
-
-/* =========================================================
-   スマホ：手動操作パネルとマップの連動
-   ========================================================= */
-
-:root {
-  --mobile-sheet-visible-height: 142px;
-  --mobile-map-shift: 71px;
-}
-
-@media screen and (max-width: 900px) {
-
-  /* 通常の閉じた高さ */
-  .side {
-    --sheet-collapsed-height: 142px;
-  }
-
-  /*
-   * ボトムシートが上がるほど、マップも同時に上へ移動する。
-   * シートに隠れていない部分の中央へ地図を合わせるため、
-   * 表示中のシート高さの半分だけ移動する。
-   */
-  .map-panel {
-    transform: translate3d(0,
-        calc(-1 * var(--mobile-map-shift)),
-        0);
-    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform;
-  }
-
-  body.sheet-dragging .map-panel {
-    transition: none;
-  }
-
-  /* 現在地ボタンもシートのすぐ上へ移動 */
-  .map-location-btn {
-    bottom: calc(var(--mobile-sheet-visible-height) + 14px + env(safe-area-inset-bottom));
-  }
-
-  body.sheet-expanded .map-location-btn {
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-  }
-
-  /* 手動操作時は、展開後もマップが十分見える高さにする */
-  body.manual-view .side {
-    height: min(72vh, 620px);
-    height: min(72dvh, 620px);
-  }
-
-  /*
-   * 閉じているときは従来どおり概要を表示。
-   * 手動操作で上まで開いたときだけ概要欄を消して、
-   * ジョイスティックをすぐ上へ配置する。
-   */
-  body.manual-view .side.is-expanded .sheet-summary {
-    display: none;
-  }
-
-  body.manual-view .side.is-expanded .manual-control-panel {
-    padding-top: 0;
-  }
-
-  /* 手動カード内の順番：見出し → ジョイスティック → 説明文 */
-  body.manual-view .manual-control-header {
-    order: 1;
-  }
-
-  body.manual-view .joystick-zone {
-    order: 2;
-    flex: 0 0 auto;
-    width: min(100%, 320px);
-    height: clamp(230px, 32dvh, 290px);
-    min-height: 230px;
-    margin: 4px auto 8px;
-  }
-
-  body.manual-view .manual-control-description {
-    order: 3;
-    margin-top: 4px;
-    margin-bottom: 10px;
-  }
-
-  body.manual-view .manual-axis-values {
-    order: 4;
-  }
-
-  body.manual-view .manual-control-note {
-    order: 5;
-  }
-
-  body.manual-view .manual-control-card {
-    min-height: 0;
-    overflow-y: auto;
-    padding-top: 12px;
-  }
-}
-
-@media screen and (max-width: 390px) {
-  body.manual-view .side {
-    height: min(74vh, 560px);
-    height: min(74dvh, 560px);
-  }
-
-  body.manual-view .joystick-zone {
-    height: 225px;
-    min-height: 225px;
-  }
-
-  body.manual-view .manual-control-description {
-    font-size: 10px;
-    line-height: 1.45;
-  }
+.joystick-label-down {
+  bottom: -10px;
 }
 
 /* =========================================================
-   スマホ手動操作時
-   ボトムシートが赤線付近より上へ来ないようにする
-   ========================================================= */
-
-@media screen and (max-width: 900px) {
-
-  /*
-   * 手動操作中のボトムシートの最大高さ
-   *
-   * 画面下から約56%の高さまでに制限するため、
-   * 上側に約44%のマップ領域が残る
-   */
-  body.manual-view #bottom-sheet {
-    height: 56vh !important;
-    height: min(56dvh, 560px) !important;
-  }
-
-  /*
-   * シートを低くした分、中身が入りきらない場合は
-   * ジョイスティック部分だけ縦スクロールできる
-   */
-  body.manual-view .manual-control-panel {
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /*
-   * 操作ボタンはシートの下部に固定して残す
-   */
-  body.manual-view .controls {
-    flex-shrink: 0;
-  }
-}
-
-/* =========================================================
-   スマホ手動操作時
-   ジョイスティック円の外側はスクロールできるようにする
-   ========================================================= */
-
-@media screen and (max-width: 900px) {
-
-  /* ジョイスティック全体のエリアは縦スクロールを許可 */
-  .joystick-zone {
-    touch-action: pan-y;
-    position: relative;
-  }
-
-  /*
-   * 前進・後退・左旋回・右旋回 の文字は
-   * スクロール操作を邪魔しないようにする
-   */
-  .joystick-label {
-    pointer-events: none;
-  }
-
-  /*
-   * 実際にジョイスティックとして反応するのは
-   * この円の部分だけ
-   */
-  .joystick-base {
-    touch-action: none;
-    pointer-events: auto;
-  }
-}
-
-/* =========================================================
-   PC版：目的地カード内だけをスクロールする
+   PC：手動操作
    ========================================================= */
 
 @media screen and (min-width: 901px) {
-
-  /*
-   * ジョイスティックと目的地カードを
-   * それぞれ独立させて重ならないようにする
-   */
   body.manual-view .manual-control-panel {
+    --manual-section-height: clamp(260px, calc((100dvh - 190px) / 2), 350px);
+
     display: grid !important;
-    grid-template-rows: auto minmax(180px, 1fr);
+    grid-template-rows: repeat(2, var(--manual-section-height));
     align-content: start;
     gap: 12px;
-
     width: 100%;
-    height: 100%;
+    height: auto;
     min-height: 0;
-
-    overflow: hidden !important;
+    overflow: hidden;
   }
 
-  /* 手動操作カードは現在の大きさを維持 */
   body.manual-view .manual-control-card {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    height: auto !important;
-    min-height: 0 !important;
-    flex: 0 0 auto !important;
-
-    overflow: hidden !important;
-  }
-
-  /*
-   * 目的地カード用の領域を
-   * ジョイスティックの下へ固定する
-   */
-  body.manual-view .manual-destination-slot {
-    display: block !important;
-    width: 100%;
+    height: var(--manual-section-height);
     min-height: 0;
-    max-height: 300px;
-    padding: 0 !important;
-
-    overflow: hidden !important;
+    max-height: none;
+    padding: 14px;
+    overflow: hidden;
   }
 
-  /*
-   * 目的地カードの外枠はそのままにして、
-   * カードの中だけスクロールさせる
-   */
+  body.manual-view .manual-control-header {
+    flex: 0 0 auto;
+  }
+
+  body.manual-view .joystick-zone {
+    flex: 1 1 auto;
+    width: min(100%, 360px);
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    margin: 0 auto;
+    overflow: visible;
+  }
+
+  body.manual-view .joystick-base {
+    width: min(72%, 225px);
+  }
+
+  body.manual-view .joystick-stick {
+    width: 70px;
+    height: 70px;
+  }
+
+  body.manual-view .manual-destination-slot {
+    display: block;
+    width: 100%;
+    height: var(--manual-section-height);
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
   body.manual-view .manual-destination-slot .destination-card {
     display: flex;
     flex-direction: column;
-
     width: 100%;
     height: 100%;
-    max-height: 300px;
     min-height: 0;
-    margin: 0 !important;
-    padding: 12px !important;
-
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-
+    max-height: none;
+    margin: 0;
+    padding: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
     scrollbar-gutter: stable;
+    scrollbar-width: thin;
   }
 
-  /* 「目的地を選択」はスクロールしても上に残す */
-  body.manual-view .manual-destination-slot .destination-card>h2 {
+  body.manual-view .manual-destination-slot .destination-card > h2 {
     position: sticky;
     top: -12px;
     z-index: 2;
-
     flex: 0 0 auto;
     margin: -12px -12px 8px;
     padding: 12px 12px 8px;
-
     background: #111827;
   }
 
-  /* 目的地の各項目だけをコンパクトにする */
+  body.light-mode.manual-view .manual-destination-slot .destination-card > h2 {
+    background: white;
+  }
+
   body.manual-view .manual-destination-slot .destination {
     flex: 0 0 auto;
-
-    min-height: 38px !important;
-    padding: 7px 12px !important;
-    margin-bottom: 5px !important;
-
+    min-height: 38px;
+    margin-bottom: 5px;
+    padding: 7px 12px;
     border-radius: 14px;
-    font-size: 14px !important;
+    font-size: 14px;
   }
 
   body.manual-view .manual-destination-slot .destination:last-child {
-    margin-bottom: 0 !important;
-  }
-
-  /* スクロールバー */
-  body.manual-view .manual-destination-slot .destination-card {
-    scrollbar-width: thin;
-    scrollbar-color:
-      rgba(148, 163, 184, 0.5) transparent;
+    margin-bottom: 0;
   }
 
   body.manual-view .manual-destination-slot .destination-card::-webkit-scrollbar {
@@ -1644,454 +1254,152 @@ body.auto-view .manual-control-panel {
     border-radius: 999px;
     background: rgba(148, 163, 184, 0.5);
   }
-
-  /* ライトモード */
-  body.light-mode.manual-view .manual-destination-slot .destination-card>h2 {
-    background: white;
-  }
-}
-
-/* =====================================================
-       手動操作画面をコンパクトにする
-       説明文を消してジョイスティック全体を見えるようにする
-   ========================================================= */
-
-/* 説明文を非表示 */
-.manual-control-description {
-  display: none !important;
-}
-
-/* 見出し下の余白を小さくする */
-.manual-control-header {
-  margin-bottom: 4px !important;
-}
-
-/* ジョイスティックを少し上へ詰める */
-.joystick-zone {
-  margin-top: 0 !important;
-}
-
-/* カード内の上下余白を調整 */
-.manual-control-card {
-  padding-top: 18px !important;
-  padding-bottom: 18px !important;
-}
-
-/* スマホ表示 */
-@media screen and (max-width: 900px) {
-
-  body.manual-view .manual-control-card {
-    padding-top: 14px !important;
-    padding-bottom: 16px !important;
-  }
-
-  body.manual-view .manual-control-header {
-    margin-bottom: 0 !important;
-  }
-
-  body.manual-view .joystick-zone {
-    margin-top: -6px !important;
-  }
-}
-
-/* ジョイスティック下の「前後・旋回」の数値表示を消す */
-.manual-axis-values {
-  display: none !important;
-}
-
-/* 消した分、カード下側の余白を小さくする */
-.manual-control-card {
-  padding-bottom: 12px !important;
 }
 
 /* =========================================================
-   ジョイスティックの前進・後退ラベルを円から離す
-   ========================================================= */
-
-.joystick-label-up {
-  top: -10px !important;
-  transform: translateX(-50%) !important;
-}
-
-.joystick-label-down {
-  bottom: -10px !important;
-  transform: translateX(-50%) !important;
-}
-
-/* ラベルがカード内で切れないようにする */
-.joystick-zone {
-  overflow: visible !important;
-}
-
-/* =========================================================
-   スマホ手動操作画面
-   ジョイスティック以外をスワイプすると目的地までスクロール
+   スマホ：マップと手動操作
    ========================================================= */
 
 @media screen and (max-width: 900px) {
-
-  /* 黄色い安全メッセージを消す */
-  .manual-control-note {
-    display: none !important;
+  .side {
+    --sheet-collapsed-height: 142px;
   }
 
-  /*
-   * 手動操作カード自体には
-   * 独立したスクロールを持たせない
-   */
-  .manual-control-card {
-    flex: 0 0 auto !important;
-    height: auto !important;
-    max-height: none !important;
-
-    padding-bottom: 16px !important;
-
-    overflow: visible !important;
-    overflow-y: visible !important;
-
-    touch-action: pan-y;
+  .map-panel {
+    transform: translate3d(0, calc(-1 * var(--mobile-map-shift)), 0);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
   }
 
-  /*
-   * ジョイスティックと目的地一覧を含む
-   * 外側のパネルだけをスクロール領域にする
-   */
+  body.sheet-dragging .map-panel {
+    transition: none;
+  }
+
+  #canvas {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .map-location-btn {
+    bottom: calc(var(--mobile-sheet-visible-height) + 14px + env(safe-area-inset-bottom));
+  }
+
+  body.sheet-expanded .map-location-btn {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  body.manual-view #bottom-sheet {
+    height: min(56vh, 560px);
+    height: min(56dvh, 560px);
+  }
+
+  body.manual-view .side.is-expanded .sheet-summary {
+    display: none;
+  }
+
   body.manual-view .manual-control-panel {
     display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
-
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 0;
+    padding: 0 14px 18px;
+    overflow-x: hidden;
+    overflow-y: auto;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
-
-    padding-bottom: 18px !important;
-  }
-
-  /*
-   * ジョイスティックの四角い領域全体では
-   * 縦スクロールを許可する
-   */
-  .joystick-zone {
-    overflow: visible !important;
-    touch-action: pan-y !important;
-  }
-
-  /*
-   * 前進・後退・左右旋回の文字は
-   * スクロール操作を邪魔しない
-   */
-  .joystick-label {
-    pointer-events: none !important;
-  }
-
-  /*
-   * 実際にロボットを操作するのは
-   * 外側の円の中だけ
-   */
-  .joystick-base {
-    touch-action: none !important;
-    pointer-events: auto !important;
-  }
-
-  /*
-   * ジョイスティックの下にある
-   * 目的地カードを通常のスクロール内容として配置
-   */
-  .manual-destination-slot {
-    display: block !important;
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    padding-bottom: 12px !important;
-
-    overflow: visible !important;
-    touch-action: pan-y;
-  }
-
-  .manual-destination-slot .destination-card {
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-    margin: 0 !important;
-
-    overflow: visible !important;
-    touch-action: pan-y;
-  }
-
-  /*
-   * スクロールバーは見えなくするが、
-   * スクロール自体は可能
-   */
-  body.manual-view .manual-control-panel {
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   body.manual-view .manual-control-panel::-webkit-scrollbar {
     display: none;
   }
-}
-/* =========================================================
-   手動操作・目的地選択の最終調整
-   ========================================================= */
 
-/* 黄色い注意文を消す */
-.manual-control-note {
-  display: none !important;
-}
-
-
-/* =========================================================
-   PC版
-   手動操作と目的地選択を同じ高さにする
-   ========================================================= */
-
-@media screen and (min-width: 901px) {
-
-  body.manual-view .manual-control-panel {
-    --manual-section-height:
-      clamp(
-        260px,
-        calc((100dvh - 190px) / 2),
-        350px
-      );
-
-    display: grid !important;
-    grid-template-rows:
-      var(--manual-section-height)
-      var(--manual-section-height);
-
-    align-content: start !important;
-    gap: 12px;
-
+  body.manual-view .manual-control-card {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
     width: 100%;
-    height: auto !important;
+    height: auto;
     min-height: 0;
-
-    overflow: hidden !important;
-  }
-
-
-  /* 上半分：手動操作 */
-  body.manual-view .manual-control-card {
-    display: flex !important;
-    flex-direction: column !important;
-
-    width: 100%;
-    height: var(--manual-section-height) !important;
-    min-height: 0 !important;
-    max-height: none !important;
-
-    padding: 14px !important;
-    overflow: hidden !important;
-  }
-
-  body.manual-view .manual-control-header {
-    flex: 0 0 auto;
-    margin-bottom: 0 !important;
-  }
-
-  body.manual-view .joystick-zone {
-    flex: 1 1 auto !important;
-
-    width: min(100%, 360px) !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-
-    margin: 0 auto !important;
-    overflow: visible !important;
-  }
-
-  body.manual-view .joystick-base {
-    width: min(72%, 225px) !important;
-  }
-
-  body.manual-view .joystick-stick {
-    width: 70px !important;
-    height: 70px !important;
-  }
-
-
-  /* 下半分：目的地選択 */
-  body.manual-view .manual-destination-slot {
-    display: block !important;
-
-    width: 100%;
-    height: var(--manual-section-height) !important;
-    min-height: 0 !important;
-
-    padding: 0 !important;
-    overflow: hidden !important;
-  }
-
-  body.manual-view
-  .manual-destination-slot
-  .destination-card {
-    display: flex !important;
-    flex-direction: column !important;
-
-    width: 100%;
-    height: 100% !important;
-    min-height: 0 !important;
-    max-height: none !important;
-
-    margin: 0 !important;
-    padding: 12px !important;
-
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-  }
-
-  body.manual-view
-  .manual-destination-slot
-  .destination-card > h2 {
-    position: sticky;
-    top: -12px;
-    z-index: 2;
-
-    margin: -12px -12px 8px;
-    padding: 12px 12px 8px;
-
-    background: #111827;
-  }
-
-  body.light-mode.manual-view
-  .manual-destination-slot
-  .destination-card > h2 {
-    background: white;
-  }
-
-  body.manual-view
-  .manual-destination-slot
-  .destination {
-    flex: 0 0 auto;
-
-    min-height: 38px !important;
-    padding: 7px 12px !important;
-    margin-bottom: 5px !important;
-
-    font-size: 14px !important;
-  }
-}
-
-
-/* =========================================================
-   スマホ版
-   手動操作をコンパクトにして目的地までスクロール可能
-   ========================================================= */
-
-@media screen and (max-width: 900px) {
-
-  body.manual-view .manual-control-panel {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-
-    min-height: 0 !important;
-    gap: 12px;
-
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-
+    max-height: none;
+    padding: 10px 14px 14px;
+    overflow: visible;
     touch-action: pan-y;
-    overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
   }
 
-  body.manual-view .manual-control-card {
-    display: flex !important;
-    flex-direction: column !important;
-
-    flex: 0 0 auto !important;
-
-    width: 100%;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-
-    padding: 10px 14px 14px !important;
-
-    overflow: visible !important;
-  }
-
-  body.manual-view .manual-control-header {
-    flex: 0 0 auto;
-    margin-bottom: 0 !important;
+  body.manual-view .manual-control-header h2 {
+    font-size: 19px;
   }
 
   body.manual-view .joystick-zone {
-    flex: 0 0 auto !important;
+    flex: 0 0 auto;
+    width: min(100%, 280px);
+    height: 240px;
+    min-height: 240px;
+    max-height: 240px;
+    margin: 0 auto 4px;
+    overflow: visible;
+    touch-action: pan-y;
+  }
 
-    width: min(100%, 280px) !important;
-    height: 240px !important;
-    min-height: 240px !important;
-    max-height: 240px !important;
-
-    margin: 0 auto 4px !important;
-
-    overflow: visible !important;
-    touch-action: pan-y !important;
+  .joystick-label {
+    pointer-events: none;
   }
 
   body.manual-view .joystick-base {
-    width: 185px !important;
-
-    touch-action: none !important;
-    pointer-events: auto !important;
+    width: 185px;
+    touch-action: none;
+    pointer-events: auto;
   }
 
   body.manual-view .joystick-stick {
-    width: 68px !important;
-    height: 68px !important;
+    width: 68px;
+    height: 68px;
   }
 
   body.manual-view .manual-destination-slot {
-    display: block !important;
-    flex: 0 0 auto !important;
-
+    display: block;
+    flex: 0 0 auto;
     width: 100%;
-    height: auto !important;
-
-    padding: 0 0 90px !important;
-    overflow: visible !important;
+    height: auto;
+    padding: 0 0 90px;
+    overflow: visible;
+    touch-action: pan-y;
   }
 
-  body.manual-view
-  .manual-destination-slot
-  .destination-card {
+  body.manual-view .manual-destination-slot .destination-card {
     width: 100%;
-    height: auto !important;
-    max-height: none !important;
+    height: auto;
+    max-height: none;
+    margin: 0;
+    overflow: visible;
+    touch-action: pan-y;
+  }
 
-    margin: 0 !important;
-    overflow: visible !important;
+  body.manual-view .controls {
+    flex-shrink: 0;
   }
 }
-
 
 @media screen and (max-width: 390px) {
-
   body.manual-view .joystick-zone {
-    height: 220px !important;
-    min-height: 220px !important;
-    max-height: 220px !important;
+    height: 220px;
+    min-height: 220px;
+    max-height: 220px;
   }
 
   body.manual-view .joystick-base {
-    width: 170px !important;
+    width: 170px;
   }
 
   body.manual-view .joystick-stick {
-    width: 62px !important;
-    height: 62px !important;
+    width: 62px;
+    height: 62px;
   }
 }

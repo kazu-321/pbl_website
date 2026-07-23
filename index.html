@@ -9,7 +9,7 @@
 
   <title>綺矢李射くん</title>
 
-  <link rel="stylesheet" href="./style.css?v=20260710-mobile-sheet-map">
+  <link rel="stylesheet" href="./style.css?v=20260723-cleanup">
 </head>
 
 <body>
@@ -182,11 +182,6 @@
               <span class="manual-mode-badge">手動モード</span>
             </div>
 
-            <p class="manual-control-description">
-              ジョイスティックを動かしてロボットを操作します。
-              指やマウスを離すと自動的に停止します。
-            </p>
-
             <div class="joystick-zone" id="joystick-zone" role="application" aria-label="ロボット手動操作ジョイスティック">
               <div class="joystick-label joystick-label-up">前進</div>
               <div class="joystick-label joystick-label-right">右旋回</div>
@@ -199,32 +194,6 @@
                 </div>
               </div>
             </div>
-
-            <div class="manual-axis-values">
-              <div class="manual-axis-item">
-                <div class="manual-axis-heading">
-                  <span>前後</span>
-                  <strong id="manual-forward-value">0.00</strong>
-                </div>
-                <div class="manual-axis-track">
-                  <span id="manual-forward-bar"></span>
-                </div>
-              </div>
-
-              <div class="manual-axis-item">
-                <div class="manual-axis-heading">
-                  <span>旋回</span>
-                  <strong id="manual-turn-value">0.00</strong>
-                </div>
-                <div class="manual-axis-track">
-                  <span id="manual-turn-bar"></span>
-                </div>
-              </div>
-            </div>
-
-            <p class="manual-control-note">
-              安全のため、操作中は自動運転を開始できません。
-            </p>
 
           </div>
         </div>
@@ -543,7 +512,7 @@
   <script src="./scripts/goal.js"></script>
   <script src="./scripts/pose.js"></script>
   <script src="./scripts/speed.js?v=20260717-1"></script>
-  <script src="./scripts/controller.js?v=20260710-circle-hit-mobile-layout"></script>
+  <script src="./scripts/controller.js?v=20260723-cleanup"></script>
   <script src="./scripts/manual-destination.js?v=20260717-1"></script>
   <script src="./scripts/script.js"></script>
 </body>
