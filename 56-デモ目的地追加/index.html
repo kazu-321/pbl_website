@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#07101f">
+
+  <title>綺矢李射くん</title>
+
+  <link rel="stylesheet" href="./style.css?v=20260710-mobile-sheet-map">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- ヘッダー -->
+    <header class="header">
+
+      <div class="time">
+        <span id="current-time"></span>
+        <span class="current-date" id="current-date"></span>
+      </div>
+
+      <div class="title-area">
+        <h1>綺矢李射くん</h1>
+        <p>Autonomous Robot</p>
+      </div>
+
+      <div class="status">
+        <span class="online-dot"></span>
+        <p id="connection-status">...</p>
+      </div>
+
+    </header>
+
+    <!-- メニューボタン -->
+    <button class="menu-btn" id="menu-btn" aria-label="メニューを開く" aria-expanded="false">
+      ☰
+    </button>
+
+    <!-- 背景の暗くなる部分 -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+
+    <!-- サイドメニュー -->
+    <nav class="side-menu" id="side-menu">
+
+      <h2>メニュー</h2>
+
+      <div class="menu-item">⚙  接続先の設定</div>
+      <div class="menu-item">📍 目的地履歴</div>
+      <div class="menu-item">🕒 走行履歴</div>
+
+      <div class="theme-area">
+
+        <p class="theme-title">画面テーマ</p>
+
+        <button class="theme-toggle" id="theme-toggle">
+          ☀ ホワイトモード
+        </button>
+
+      </div>
+    </nav>
+
+    <!-- メイン -->
+    <main class="main">
+
+      <!-- マップ -->
+      <section class="map-panel glass">
+        <canvas id="canvas"></canvas>
+        <button class="map-location-btn" aria-label="現在地を表示">
+          ◎
+        </button>
+
+      </section>
+
+      <!-- PCでは右側、スマホでは下から出るボトムシート -->
+      <aside class="side" id="bottom-sheet" aria-label="操作パネル">
+
+        <!-- スマホだけ表示するドラッグ部分 -->
+        <div class="sheet-drag-area" id="sheet-drag-area" aria-label="操作パネルを開閉">
+          <span class="sheet-handle"></span>
+        </div>
+
+        <!-- スマホの閉じた状態で見える概要 -->
+        <div class="sheet-summary">
+
+          <div class="sheet-summary-text">
+            <p class="sheet-eyebrow" id="sheet-eyebrow">選択中の目的地</p>
+            <h2 id="selected-destination">読み込み中...</h2>
+            <p>
+              <span id="selected-time">--</span>
+              <span>・68m</span>
+            </p>
+          </div>
+
+          <button class="sheet-toggle" id="sheet-toggle" type="button" aria-expanded="false">
+            詳細
+          </button>
+
+        </div>
+
+        <div class="side-cards">
+
+          <!-- 目的地 -->
+          <div class="card glass destination-card">
+
+            <h2>目的地を選択</h2>
+
+
+            <!-- 目的地ボタンは goal.js が manifest.json から自動生成します -->
+            <p id="destination-loading">目的地を読み込み中...</p>
+
+          </div>
+
+          <!-- ルート情報 -->
+          <div class="card glass">
+
+            <h2>ルート情報</h2>
+
+            <div class="info-grid">
+
+              <div>
+                <p class="label">到着予想</p>
+                <p class="value">1分20秒</p>
+              </div>
+
+              <div>
+                <p class="label">距離</p>
+                <p class="value">68m</p>
+              </div>
+
+              <div>
+                <p class="label">進行状況</p>
+                <p class="value">65%</p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ロボット状態 -->
+          <div class="card glass">
+
+            <h2>ロボットの状態</h2>
+
+            <div class="info-grid">
+
+              <div>
+                <p class="label">速度</p>
+                <p class="value" id="robot-speed">－</p>
+              </div>
+
+              <div>
+                <p class="label">バッテリー</p>
+                <p class="value">82%</p>
+              </div>
+
+              <div>
+                <p class="label">接続状態</p>
+                <p class="value green">良好</p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- 手動モード時に右側へ表示するジョイスティック -->
+        <div class="manual-control-panel" id="manual-control-panel" aria-hidden="true">
+          <div class="card glass manual-control-card">
+
+            <div class="manual-control-header">
+              <div>
+                <p class="manual-control-eyebrow">MANUAL CONTROL</p>
+                <h2>手動操作</h2>
+              </div>
+
+              <span class="manual-mode-badge">手動モード</span>
+            </div>
+
+            <p class="manual-control-description">
+              ジョイスティックを動かしてロボットを操作します。
+              指やマウスを離すと自動的に停止します。
+            </p>
+
+            <div class="joystick-zone" id="joystick-zone" role="application" aria-label="ロボット手動操作ジョイスティック">
+              <div class="joystick-label joystick-label-up">前進</div>
+              <div class="joystick-label joystick-label-right">右旋回</div>
+              <div class="joystick-label joystick-label-down">後退</div>
+              <div class="joystick-label joystick-label-left">左旋回</div>
+
+              <div class="joystick-base" id="joystick-base">
+                <div class="joystick-stick" id="joystick-stick">
+                  <span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="manual-axis-values">
+              <div class="manual-axis-item">
+                <div class="manual-axis-heading">
+                  <span>前後</span>
+                  <strong id="manual-forward-value">0.00</strong>
+                </div>
+                <div class="manual-axis-track">
+                  <span id="manual-forward-bar"></span>
+                </div>
+              </div>
+
+              <div class="manual-axis-item">
+                <div class="manual-axis-heading">
+                  <span>旋回</span>
+                  <strong id="manual-turn-value">0.00</strong>
+                </div>
+                <div class="manual-axis-track">
+                  <span id="manual-turn-bar"></span>
+                </div>
+              </div>
+            </div>
+
+            <p class="manual-control-note">
+              安全のため、操作中は自動運転を開始できません。
+            </p>
+
+          </div>
+        </div>
+
+        <!-- PCではマップ下、スマホではボトムシート下部 -->
+        <div class="controls">
+
+          <button class="control-btn stop" id="power-toggle-btn" type="button">
+            一時停止
+          </button>
+
+          <button class="control-btn start" id="auto-toggle-btn" type="button">
+            ▶ 自動運転を開始
+          </button>
+
+        </div>
+
+      </aside>
+
+    </main>
+
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+
+      const week = ["日", "月", "火", "水", "木", "金", "土"];
+      const day = week[now.getDay()];
+
+      document.getElementById("current-time").textContent = `${hours}:${minutes}`;
+      document.getElementById("current-date").textContent = `${month}月${date}日(${day})`;
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // サイドメニューの開閉
+    const menuBtn = document.getElementById("menu-btn");
+    const sideMenu = document.getElementById("side-menu");
+    const menuOverlay = document.getElementById("menu-overlay");
+
+    function closeMenu() {
+      sideMenu.classList.remove("show");
+      menuOverlay.classList.remove("show");
+      menuBtn.setAttribute("aria-expanded", "false");
+    }
+
+    menuBtn.addEventListener("click", function () {
+      const willOpen = !sideMenu.classList.contains("show");
+      sideMenu.classList.toggle("show", willOpen);
+      menuOverlay.classList.toggle("show", willOpen);
+      menuBtn.setAttribute("aria-expanded", String(willOpen));
+    });
+
+    menuOverlay.addEventListener("click", closeMenu);
+
+    // テーマ切り替え
+    const themeToggle = document.getElementById("theme-toggle");
+    const rootElement = document.documentElement;
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
+    themeToggle.addEventListener("click", function () {
+      const isLightMode = !document.body.classList.contains("light-mode");
+
+      // bodyだけでなくhtmlにも付けて、画面外や余白も確実に切り替える
+      document.body.classList.toggle("light-mode", isLightMode);
+      rootElement.classList.toggle("light-mode", isLightMode);
+
+      themeToggle.textContent = isLightMode
+        ? "🌙 ダークモード"
+        : "☀ ホワイトモード";
+
+      // スマホのブラウザ上部などの色もテーマに合わせる
+      themeColorMeta?.setAttribute(
+        "content",
+        isLightMode ? "#f3f6fb" : "#07101f"
+      );
+    });
+
+    // スマホ用ボトムシート
+    const bottomSheet = document.getElementById("bottom-sheet");
+    const sheetDragArea = document.getElementById("sheet-drag-area");
+    const sheetSummary = document.querySelector(".sheet-summary");
+    const sheetToggle = document.getElementById("sheet-toggle");
+    const sheetSwipeAreas = [sheetDragArea, sheetSummary];
+    const mobileMedia = window.matchMedia("(max-width: 900px)");
+
+    let isDragging = false;
+    let activeSwipeArea = null;
+    let startY = 0;
+    let startOffset = 0;
+    let currentOffset = 0;
+
+    function getClosedVisibleHeight() {
+      const cssValue = getComputedStyle(bottomSheet)
+        .getPropertyValue("--sheet-collapsed-height")
+        .trim();
+
+      const parsedValue = Number.parseFloat(cssValue);
+
+      if (Number.isFinite(parsedValue) && parsedValue > 0) {
+        return Math.min(bottomSheet.offsetHeight, parsedValue);
+      }
+
+      return Math.min(bottomSheet.offsetHeight, 142);
+    }
+
+    function getClosedOffset() {
+      return Math.max(
+        0,
+        bottomSheet.offsetHeight - getClosedVisibleHeight()
+      );
+    }
+
+    /*
+     * ボトムシートが上がった分だけマップの中心も上へ移動させる。
+     * シートで隠れていない領域の中央に、マップの中心が来るように
+     * 表示中のシート高さの半分だけ上へ動かす。
+     */
+    function updateMapPositionForSheet(offset) {
+      if (!mobileMedia.matches) {
+        document.documentElement.style.removeProperty(
+          "--mobile-sheet-visible-height"
+        );
+        document.documentElement.style.removeProperty(
+          "--mobile-map-shift"
+        );
+        return;
+      }
+
+      const maxOffset = getClosedOffset();
+      const safeOffset = Math.min(
+        maxOffset,
+        Math.max(0, Number(offset) || 0)
+      );
+
+      const visibleHeight = Math.max(
+        0,
+        bottomSheet.offsetHeight - safeOffset
+      );
+
+      const mapShift = visibleHeight / 2;
+
+      document.documentElement.style.setProperty(
+        "--mobile-sheet-visible-height",
+        `${visibleHeight}px`
+      );
+
+      document.documentElement.style.setProperty(
+        "--mobile-map-shift",
+        `${mapShift}px`
+      );
+    }
+
+    function syncSheetAndMap() {
+      if (!mobileMedia.matches) {
+        bottomSheet.style.removeProperty("transform");
+        updateMapPositionForSheet(0);
+        return;
+      }
+
+      const offset = bottomSheet.classList.contains("is-expanded")
+        ? 0
+        : getClosedOffset();
+
+      updateMapPositionForSheet(offset);
+    }
+
+    function setSheetExpanded(expanded) {
+      bottomSheet.classList.toggle("is-expanded", expanded);
+      bottomSheet.style.removeProperty("transform");
+      bottomSheet.classList.remove("is-dragging");
+      document.body.classList.remove("sheet-dragging");
+
+      sheetToggle.textContent = expanded ? "閉じる" : "詳細";
+      sheetToggle.setAttribute("aria-expanded", String(expanded));
+      document.body.classList.toggle("sheet-expanded", expanded);
+
+      requestAnimationFrame(syncSheetAndMap);
+    }
+
+    function resetSheetForViewport() {
+      if (!mobileMedia.matches) {
+        setSheetExpanded(false);
+        bottomSheet.style.removeProperty("transform");
+        updateMapPositionForSheet(0);
+        return;
+      }
+
+      requestAnimationFrame(syncSheetAndMap);
+    }
+
+    sheetToggle.addEventListener("click", () => {
+      setSheetExpanded(!bottomSheet.classList.contains("is-expanded"));
+    });
+
+    function startSheetDrag(event) {
+      if (!mobileMedia.matches) return;
+
+      // 「詳細」ボタンなどの操作を邪魔しない
+      if (event.target.closest("button")) return;
+
+      isDragging = true;
+      activeSwipeArea = event.currentTarget;
+      startY = event.clientY;
+      startOffset = bottomSheet.classList.contains("is-expanded")
+        ? 0
+        : getClosedOffset();
+      currentOffset = startOffset;
+
+      bottomSheet.classList.add("is-dragging");
+      document.body.classList.add("sheet-dragging");
+      activeSwipeArea.setPointerCapture(event.pointerId);
+
+      updateMapPositionForSheet(currentOffset);
+    }
+
+    function moveSheetDrag(event) {
+      if (!isDragging || !mobileMedia.matches) return;
+
+      const maxOffset = getClosedOffset();
+      const moved = event.clientY - startY;
+      currentOffset = Math.min(
+        maxOffset,
+        Math.max(0, startOffset + moved)
+      );
+
+      bottomSheet.style.transform = `translateY(${currentOffset}px)`;
+      updateMapPositionForSheet(currentOffset);
+    }
+
+    function finishSheetDrag(event) {
+      if (!isDragging) return;
+
+      isDragging = false;
+      const movedDistance = Math.abs(event.clientY - startY);
+      const maxOffset = getClosedOffset();
+
+      if (activeSwipeArea?.hasPointerCapture(event.pointerId)) {
+        activeSwipeArea.releasePointerCapture(event.pointerId);
+      }
+      activeSwipeArea = null;
+
+      if (movedDistance < 6) {
+        setSheetExpanded(!bottomSheet.classList.contains("is-expanded"));
+        return;
+      }
+
+      setSheetExpanded(currentOffset < maxOffset * 0.55);
+    }
+
+    // ハンドルだけでなく、閉じた状態で見えている概要部分全体からスワイプできる
+    sheetSwipeAreas.forEach(area => {
+      area.addEventListener("pointerdown", startSheetDrag);
+      area.addEventListener("pointermove", moveSheetDrag);
+      area.addEventListener("pointerup", finishSheetDrag);
+      area.addEventListener("pointercancel", finishSheetDrag);
+    });
+
+    window.addEventListener("resize", resetSheetForViewport);
+    mobileMedia.addEventListener?.("change", resetSheetForViewport);
+
+    /*
+     * controller.js が manual-view / auto-view を切り替えたとき、
+     * シートの高さとマップ位置を再計算する。
+     */
+    const bodyClassObserver = new MutationObserver(() => {
+      requestAnimationFrame(syncSheetAndMap);
+    });
+
+    bodyClassObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    resetSheetForViewport();
+
+    // iPhone・iPadでページ全体がピンチ拡大されるのを防止
+    ["gesturestart", "gesturechange", "gestureend"].forEach(eventName => {
+      document.addEventListener(
+        eventName,
+        event => {
+          event.preventDefault();
+        },
+        { passive: false }
+      );
+    });
+
+    // マップ以外での2本指操作を防止
+    document.addEventListener(
+      "touchmove",
+      event => {
+        const isCanvas =
+          event.target instanceof Element &&
+          event.target.closest("#canvas");
+
+        if (event.touches.length >= 2 && !isCanvas) {
+          event.preventDefault();
+        }
+      },
+      { passive: false }
+    );
+
+  </script>
+
+  <script src="./scripts/roslib.js"></script>
+  <script src="./scripts/map.js?v=20260710-canvas-fix2"></script>
+  <script src="./scripts/path.js"></script>
+  <script src="./scripts/goal.js"></script>
+  <script src="./scripts/pose.js"></script>
+  <script src="./scripts/speed.js?v=20260717-1"></script>
+  <script src="./scripts/controller.js?v=20260710-circle-hit-mobile-layout"></script>
+  <script src="./scripts/manual-destination.js?v=20260717-1"></script>
+  <script src="./scripts/script.js"></script>
+</body>
+
+</html>
